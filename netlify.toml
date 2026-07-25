@@ -1,0 +1,23 @@
+# Netlify — Circuit Mapper (PWA offline-first)
+# Sem build no cloud: o bundle ja e gerado localmente (npm run build:web) em dist/.
+[build]
+  command = ""
+  publish = "dist"
+
+# Raiz serve o app (arquivo unico). SW/manifest/icones servidos diretos.
+[[redirects]]
+  from = "/"
+  to = "/CIRCUIT-MAPPER.html"
+  status = 200
+
+# Service worker nunca deve ser cacheado pelo CDN.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=3600"

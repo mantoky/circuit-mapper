@@ -92,6 +92,13 @@ function __require(id) {
   fs.copyFileSync(path.join(ROOT, 'web/sw.js'), path.join(ROOT, 'dist/sw.js'));
   makeIcons.main();
 
+  // Deploy: _redirects (Netlify) — raiz serve o app; SW/manifest servidos diretos
+  fs.writeFileSync(
+    path.join(ROOT, 'dist/_redirects'),
+    '/  /CIRCUIT-MAPPER.html  200\n',
+    'utf8'
+  );
+
   const kb = (fs.statSync(dest).size / 1024).toFixed(0);
   console.log(`Bundle gerado: dist/CIRCUIT-MAPPER.html  (${kb} kB, ${MODULES.length} modulos do core embarcados) + PWA (manifest, sw, icones)`);
   return dest;
