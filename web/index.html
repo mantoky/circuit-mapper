@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"/>
+<meta name="theme-color" content="#0A1422"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="apple-mobile-web-app-title" content="Circuit Mapper"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<title>Circuit Mapper</title>
+<style>/*__CSS__*/</style>
+</head>
+<body>
+<div id="splash">
+  <div class="sp-stripe"></div>
+  <div class="sp-brand">CIRCUIT MAPPER</div>
+  <div class="sp-tag">MAPEAMENTO E CADASTRO DE CIRCUITOS ELETRICOS</div>
+  <div class="sp-load">Carregando levantamento local...</div>
+</div>
+
+<header id="topbar">
+  <div class="tb-stripe"></div>
+  <div class="tb-txt">
+    <div class="tb-title" id="scrTitle">PROJETO</div>
+    <div class="tb-sub" id="scrSub">Mapeamento e Cadastro de Circuitos Eletricos</div>
+  </div>
+  <button class="tb-btn" id="btnUndo" title="Desfazer">↶</button>
+  <button class="tb-btn" id="btnRedo" title="Refazer">↷</button>
+</header>
+
+<main id="screen"></main>
+
+<nav id="tabbar">
+  <button class="tab" data-tab="projeto"><span class="ti">PRJ</span><span class="tl">Projeto</span></button>
+  <button class="tab" data-tab="construcao"><span class="ti">ARV</span><span class="tl">Construcao</span></button>
+  <button class="tab" data-tab="conformidade"><span class="ti">NBR</span><span class="tl">Conformidade</span></button>
+  <button class="tab" data-tab="laudo"><span class="ti">DOC</span><span class="tl">Laudo</span></button>
+</nav>
+
+<div id="sheetHost" class="hidden">
+  <div id="backdrop"></div>
+  <section id="sheet">
+    <div class="grabber"></div>
+    <div class="sh-head">
+      <div class="sh-txt">
+        <div class="sh-title" id="shTitle"></div>
+        <div class="sh-sub" id="shSub"></div>
+      </div>
+      <button class="sh-close" id="shClose">FECHAR</button>
+    </div>
+    <div class="sh-body" id="shBody"></div>
+    <div class="sh-foot hidden" id="shFoot"></div>
+  </section>
+</div>
+
+<div id="toast" class="hidden"></div>
+
+<script>
+//__RUNTIME__
+</script>
+<script>
+//__APP__
+</script>
+<script>
+//__SW__
+</script>
+</body>
+</html>

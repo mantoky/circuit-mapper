@@ -1,0 +1,26 @@
+# Dependencias
+node_modules/
+.expo/
+.expo-shared/
+
+# Build nativo
+android/
+ios/
+.gradle/
+*.apk
+*.aab
+*.ipa
+
+# Bundle web gerado (rode `npm run build:web`)
+dist/
+
+# Saidas de testes/amostras (regeneradas)
+tests/output/
+
+# Misc
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.local

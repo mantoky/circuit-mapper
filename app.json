@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Circuit Mapper",
+    "slug": "circuit-mapper",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0E1A2B"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "br.com.robsondocarmo.circuitmapper",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Necessario para anexar logos e fotos de campo ao laudo.",
+        "NSCameraUsageDescription": "Necessario para registrar fotos dos quadros eletricos em campo."
+      }
+    },
+    "android": {
+      "package": "br.com.robsondocarmo.circuitmapper",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0E1A2B"
+      },
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "CAMERA"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Permitir acesso a galeria para inserir logos da contratada e contratante."
+        }
+      ]
+    ]
+  }
+}
