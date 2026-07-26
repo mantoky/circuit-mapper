@@ -80,7 +80,9 @@ function __require(id) {
     .replace('//__APP__', () => ui)
     .replace('//__SW__', () =>
       "if ('serviceWorker' in navigator) { window.addEventListener('load', function () { " +
-      "navigator.serviceWorker.register('sw.js').catch(function () {}); }); }"
+      "navigator.serviceWorker.register('sw.js').catch(function () {}); " +
+      "var __r=false; navigator.serviceWorker.addEventListener('controllerchange', function () { " +
+      "if(!__r){__r=true; window.location.reload();} }); }); }"
     );
 
   const dest = path.join(ROOT, 'dist', 'CIRCUIT-MAPPER.html');
@@ -91,6 +93,11 @@ function __require(id) {
   fs.copyFileSync(path.join(ROOT, 'web/manifest.webmanifest'), path.join(ROOT, 'dist/manifest.webmanifest'));
   fs.copyFileSync(path.join(ROOT, 'web/sw.js'), path.join(ROOT, 'dist/sw.js'));
   makeIcons.main();
+
+  // Versiona o cache do SW por build -> atualizacoes propagam (novo sw.js -> skipWaiting -> reload)
+  const swPath = path.join(ROOT, 'dist/sw.js');
+  const swBuild = fs.readFileSync(swPath, 'utf8').replace(/__SW_CACHE__/g, 'vcm-' + Date.now().toString(36));
+  fs.writeFileSync(swPath, swBuild, 'utf8');
 
   // Deploy: _redirects (Netlify) — raiz serve o app; SW/manifest servidos diretos
   fs.writeFileSync(

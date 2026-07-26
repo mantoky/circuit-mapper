@@ -1,6 +1,6 @@
 /* Service Worker - Circuit Mapper (offline-first, app shell)
  * Cache estatico do app shell (HTML unico + icones + manifest). */
-const CACHE = 'vcm-v1';
+const CACHE = '__SW_CACHE__';
 const ASSETS = [
   './',
   './CIRCUIT-MAPPER.html',
