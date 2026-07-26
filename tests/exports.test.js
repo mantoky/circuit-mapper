@@ -175,4 +175,22 @@ const appSrc = fs.readFileSync(path.join(__dirname, '..', 'src', 'export', 'xlsx
 H.ok(!/exceljs/.test(appSrc.replace(/\/\*[\s\S]*?\*\//g, '')),
   '7.13 xlsxExport nao importa exceljs (apenas em comentario explicativo)');
 
+/* ---------- 8. REGISTRO FOTOGRAFICO ---------- */
+H.section('8. Registro Fotografico (fotos embutidas no laudo)');
+const T = require('../src/core/treeEngine');
+let ptree = [];
+ptree = T.addChild(ptree, null, { type: 'panel', label: 'QGBT-01' });
+const qid = ptree[0].id;
+ptree = T.addPhoto(ptree, qid, {
+  id: 'ph_t1', uri: 'data:image/jpeg;base64,ZmFrZQ==', caption: 'Quadro geral aberto', takenAt: '2026-07-25T00:00:00Z',
+});
+const phtml = buildLaudoHtml(ptree, { ...seedReportHeader });
+H.ok(phtml.includes('Registro Fotografico'), '8.1 pagina de registro fotografico presente quando ha fotos');
+H.ok(phtml.includes('data:image/jpeg;base64,ZmFrZQ=='), '8.2 imagem embutida como data URI no laudo');
+H.ok(phtml.includes('Quadro geral aberto'), '8.3 legenda da foto renderizada');
+H.ok(phtml.includes('QGBT-01'), '8.4 localizacao (path) do item exibida na galeria');
+// sem fotos => sem pagina de registro
+const noPhotoHtml = buildLaudoHtml(tree, header);
+H.ok(!noPhotoHtml.includes('Registro Fotografico'), '8.5 sem fotos => pagina de registro omitida');
+
 module.exports = H.report('TESTES DE EXPORTACAO');

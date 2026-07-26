@@ -15,6 +15,25 @@ function sanitizeLogo(v) {
   return v ?? null;
 }
 
+/** Saneia meta.photos: descarta remoto (http/https) e entradas malformadas. */
+function sanitizePhotos(nodes) {
+  (nodes || []).forEach((n) => {
+    const meta = n.meta || {};
+    if (Array.isArray(meta.photos)) {
+      meta.photos = meta.photos
+        .filter((p) => p && typeof p === 'object' && typeof p.uri === 'string' && p.uri.trim())
+        .map((p) => ({
+          id: String(p.id || p.uri),
+          uri: /^https?:/i.test(p.uri.trim()) ? '' : p.uri,
+          caption: typeof p.caption === 'string' ? p.caption : '',
+          takenAt: p.takenAt || undefined,
+        }))
+        .filter((p) => p.uri);
+    }
+    sanitizePhotos(n.children);
+  });
+}
+
 function validateNodeShape(node, depthNum, seen) {
   if (!node || typeof node !== 'object' || Array.isArray(node)) {
     throw new Error('No invalido (nao e objeto).');
@@ -61,10 +80,11 @@ function validateImport(data) {
   if (header.contractorLogo !== undefined) header.contractorLogo = sanitizeLogo(header.contractorLogo);
   if (header.clientLogo !== undefined) header.clientLogo = sanitizeLogo(header.clientLogo);
 
+  sanitizePhotos(data.tree);
   return { tree: data.tree, header };
 }
 
 module.exports = {
   MAX_NODES, MAX_DEPTH,
-  sanitizeLogo, validateNodeShape, validateImport,
+  sanitizeLogo, sanitizePhotos, validateNodeShape, validateImport,
 };

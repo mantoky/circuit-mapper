@@ -10,6 +10,7 @@ import VField from './VField';
 import VSelect from './VSelect';
 import VButton from './VButton';
 import StatusChip from './StatusChip';
+import PhotoPicker from './PhotoPicker';
 import { colors, type, metrics } from '../theme';
 import { fieldsFor, typeInfo } from '../core/schema';
 import { validateCircuit } from '../core/validation';
@@ -17,6 +18,7 @@ import { validateCircuit } from '../core/validation';
 export default function AttributeEditor({
   node, purpose, onChangeLabel, onChangeAttribute,
   onAddCustom, onRemoveCustom, onAutoSize,
+  onAddPhoto, onRemovePhoto, onCaptionPhoto,
 }) {
   const [newKey, setNewKey] = useState('');
   const [newValue, setNewValue] = useState('');
@@ -82,6 +84,18 @@ export default function AttributeEditor({
           ))}
         </View>
       )}
+
+      {/* --------- Fotos do item --------- */}
+      <Text style={styles.section}>Fotos do Item</Text>
+      <Text style={styles.sectionHint}>
+        Registre fotos do ponto de inspecao (quadro, ativo, detalhe). Elas sao embutidas no laudo tecnico.
+      </Text>
+      <PhotoPicker
+        photos={node.meta?.photos || []}
+        onAdd={onAddPhoto}
+        onRemove={onRemovePhoto}
+        onCaption={onCaptionPhoto}
+      />
 
       {/* --------- Campos do schema --------- */}
       <Text style={styles.section}>Atributos Tecnicos</Text>

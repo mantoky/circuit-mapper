@@ -183,6 +183,30 @@ function setAttribute(nodes, id, key, value) {
   });
 }
 
+/** Anexa uma foto ao no em meta.photos. photo: { id, uri, caption, takenAt } */
+function addPhoto(nodes, id, photo) {
+  return mapNode(nodes, id, (n) => {
+    const photos = [...(n.meta?.photos || []), photo];
+    return touch({ ...n, meta: { ...(n.meta || {}), photos } });
+  });
+}
+
+/** Remove uma foto pelo photoId */
+function removePhoto(nodes, id, photoId) {
+  return mapNode(nodes, id, (n) => {
+    const photos = (n.meta?.photos || []).filter((p) => p.id !== photoId);
+    return touch({ ...n, meta: { ...(n.meta || {}), photos } });
+  });
+}
+
+/** Atualiza legenda de uma foto */
+function setPhotoCaption(nodes, id, photoId, caption) {
+  return mapNode(nodes, id, (n) => {
+    const photos = (n.meta?.photos || []).map((p) => (p.id === photoId ? { ...p, caption } : p));
+    return touch({ ...n, meta: { ...(n.meta || {}), photos } });
+  });
+}
+
 function renameAttribute(nodes, id, oldKey, newKey) {
   return mapNode(nodes, id, (n) => {
     const attrs = { ...(n.attributes || {}) };
@@ -296,6 +320,7 @@ module.exports = {
   makeId, createNode,
   findNode, findPath, findParent, depth, flatten, collectByType, countByType, countAll, search,
   mapNode, addChild, updateNode, setAttribute, renameAttribute,
+  addPhoto, removePhoto, setPhotoCaption,
   removeNode, extractNode, moveNode, reorderSibling, duplicateNode, cloneSubtree,
   isDescendant, canNest, auditTree,
 };

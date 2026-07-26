@@ -183,6 +183,14 @@ function styles() {
   .sigblock { display:flex; gap:8mm; margin-top:18mm; }
   .sigblock div { flex:1; text-align:center; border-top:.9pt solid #333; padding-top:2mm; font-size:8pt; }
   .sigblock strong { display:block; font-size:10pt; }
+
+  /* ---------- REGISTRO FOTOGRAFICO ---------- */
+  .gallery { display:flex; flex-wrap:wrap; gap:4mm; }
+  .ph { width:72mm; page-break-inside:avoid; border:.6pt solid #CCC; border-radius:1.4mm;
+        overflow:hidden; background:#FAFAFA; }
+  .ph img { width:100%; height:48mm; object-fit:cover; display:block; }
+  .ph .cap { font-size:8pt; padding:1.6mm 2mm .6mm; font-weight:600; color:#0E1A2B; }
+  .ph .loc { font-size:7pt; padding:0 2mm 1.8mm; color:#777; }
   `;
 }
 
@@ -374,6 +382,36 @@ function assetPage(h, tree) {
   </div>`;
 }
 
+function photosPage(h, tree) {
+  const items = [];
+  const walk = (nodes, trail) => {
+    (nodes || []).forEach((n) => {
+      const path = [...trail, n.label].join(' > ');
+      const photos = (n.meta && n.meta.photos) || [];
+      photos.forEach((p) => {
+        if (!p || !p.uri) return;
+        items.push({ path, caption: p.caption || '', uri: p.uri, type: typeInfo(n.type).label });
+      });
+      walk(n.children, [...trail, n.label]);
+    });
+  };
+  walk(tree, []);
+  if (!items.length) return '';
+  const cards = items.map((it) => `
+    <div class="ph">
+      <img src="${esc(it.uri)}"/>
+      <div class="cap">${esc(it.caption || '(sem legenda)')}</div>
+      <div class="loc">${esc(it.path)}</div>
+    </div>`).join('');
+  return `
+  <div class="page">
+    ${pageHeader(h, 'Registro Fotografico')}
+    <h3 class="sec">Registro Fotografico</h3>
+    <p>Imagens coletadas em campo durante o levantamento, organizadas por ponto de inspecao.</p>
+    <div class="gallery">${cards}</div>
+  </div>`;
+}
+
 function findingsPage(h, val) {
   const order = { error: 0, warn: 1 };
   const list = [...val.findings].sort((a, b) => (order[a.level] - order[b.level]) || a.code.localeCompare(b.code));
@@ -466,13 +504,14 @@ function conclusionPage(h, val) {
  */
 function buildLaudoHtml(tree, header = {}, opts = {}) {
   const val = validateTree(tree);
-  const s = opts.sections || ['cover', 'intro', 'tree', 'tables', 'assets', 'findings', 'conclusion'];
+  const s = opts.sections || ['cover', 'intro', 'tree', 'tables', 'assets', 'photos', 'findings', 'conclusion'];
   const parts = [];
   if (s.includes('cover')) parts.push(coverPage(header));
   if (s.includes('intro')) parts.push(introPage(header, tree, val));
   if (s.includes('tree')) parts.push(treePage(header, tree));
   if (s.includes('tables')) parts.push(loadTablePages(header, tree));
   if (s.includes('assets')) parts.push(assetPage(header, tree));
+  if (s.includes('photos')) parts.push(photosPage(header, tree));
   if (s.includes('findings')) parts.push(findingsPage(header, val));
   if (s.includes('conclusion')) parts.push(conclusionPage(header, val));
 

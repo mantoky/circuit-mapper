@@ -156,6 +156,9 @@ export default function ExplorerScreen() {
               onChangeAttribute={(k, v) => P.setAttribute(editNode.id, k, v)}
               onAddCustom={(k, v) => P.setAttribute(editNode.id, k, v || '-')}
               onRemoveCustom={(k) => P.setAttribute(editNode.id, k, '')}
+              onAddPhoto={(photo) => P.addPhoto(editNode.id, photo)}
+              onRemovePhoto={(photoId) => P.removePhoto(editNode.id, photoId)}
+              onCaptionPhoto={(photoId, caption) => P.setPhotoCaption(editNode.id, photoId, caption)}
               onAutoSize={editNode.type === 'circuit' ? handleAutoSize : null}
             />
           </>

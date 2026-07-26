@@ -104,4 +104,35 @@ let accepted = true;
 try { validateImport({ tree: okTree }); } catch { accepted = false; }
 H.ok(accepted, '5.10 arvore bem formada aceita');
 
+/* ==================== 6. FOTOS POR ITEM (meta.photos) ==================== */
+H.section('6. Fotos por item (meta.photos)');
+
+let pt = [];
+pt = T.addChild(pt, null, { type: 'panel', label: 'QGBT-01' });
+const pid = pt[0].id;
+const photo = { id: 'ph_1', uri: 'data:image/jpeg;base64,AAA', caption: 'Quadro aberto', takenAt: '2026-07-25T00:00:00Z' };
+pt = T.addPhoto(pt, pid, photo);
+H.eq(T.findNode(pt, pid).meta.photos.length, 1, '6.1 addPhoto anexa em meta.photos');
+H.eq(T.findNode(pt, pid).meta.photos[0].caption, 'Quadro aberto', '6.2 foto preserva legenda');
+
+pt = T.setPhotoCaption(pt, pid, 'ph_1', 'Quadro geral');
+H.eq(T.findNode(pt, pid).meta.photos[0].caption, 'Quadro geral', '6.3 setPhotoCaption atualiza legenda');
+
+pt = T.addPhoto(pt, pid, { id: 'ph_2', uri: 'data:image/png;base64,BBB', caption: '', takenAt: '2026-07-25T00:01:00Z' });
+H.eq(T.findNode(pt, pid).meta.photos.length, 2, '6.4 segunda foto anexada');
+
+pt = T.removePhoto(pt, pid, 'ph_1');
+H.eq(T.findNode(pt, pid).meta.photos.length, 1, '6.5 removePhoto remove pelo id');
+H.eq(T.findNode(pt, pid).meta.photos[0].id, 'ph_2', '6.6 foto correta permanece');
+
+// import sanitiza fotos remotas
+const withRemote = validateImport({
+  tree: [{ id: 'n1', type: 'panel', meta: { photos: [
+    { id: 'p1', uri: 'https://evil.example/x.jpg', caption: 'remota' },
+    { id: 'p2', uri: 'data:image/jpeg;base64,CCC', caption: 'local' },
+  ] }, children: [] }],
+});
+H.eq(withRemote.tree[0].meta.photos.length, 1, '6.7 foto remota (http) descartada no import');
+H.eq(withRemote.tree[0].meta.photos[0].uri, 'data:image/jpeg;base64,CCC', '6.8 foto local preservada');
+
 module.exports = H.report('TESTES DE SEGURANCA E REGRESSAO');

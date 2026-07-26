@@ -59,6 +59,12 @@ function reducer(state, action) {
       return withHistory(state, engine.updateNode(state.tree, action.id, action.patch));
     case 'SET_ATTRIBUTE':
       return withHistory(state, engine.setAttribute(state.tree, action.id, action.key, action.value));
+    case 'ADD_PHOTO':
+      return withHistory(state, engine.addPhoto(state.tree, action.id, action.photo));
+    case 'REMOVE_PHOTO':
+      return withHistory(state, engine.removePhoto(state.tree, action.id, action.photoId));
+    case 'SET_PHOTO_CAPTION':
+      return withHistory(state, engine.setPhotoCaption(state.tree, action.id, action.photoId, action.caption));
     case 'RENAME_ATTRIBUTE':
       return withHistory(state, engine.renameAttribute(state.tree, action.id, action.oldKey, action.newKey));
     case 'REMOVE_NODE':

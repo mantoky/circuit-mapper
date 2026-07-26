@@ -551,6 +551,88 @@ function openEdit(id){
     }
   });
 
+  /* fotos do item */
+  body.appendChild(section('Fotos do Item'));
+  body.appendChild(el('p','hint',
+    'Registre fotos do ponto de inspecao. Elas sao embutidas no laudo tecnico.'));
+  var photoHost = el('div');
+  body.appendChild(photoHost);
+
+  function resizeDataUri(file, cb){
+    var r = new FileReader();
+    r.onload = function(){
+      var img = new Image();
+      img.onload = function(){
+        var max = 1280, w = img.width, h = img.height;
+        if(w > max || h > max){ if(w >= h){ h = Math.round(h*max/w); w = max; } else { w = Math.round(w*max/h); h = max; } }
+        var c = document.createElement('canvas'); c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        cb(c.toDataURL('image/jpeg', 0.7));
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(file);
+  }
+
+  function drawPhotos(){
+    clear(photoHost);
+    var n = T.findNode(S.tree,id);
+    var photos = (n.meta && n.meta.photos) || [];
+    var grid = el('div'); grid.style.cssText='display:flex;flex-wrap:wrap;gap:10px;margin-top:10px';
+    photos.forEach(function(p){
+      var cell = el('div'); cell.style.cssText='width:108px;position:relative';
+      var img = el('img'); img.src = p.uri;
+      img.style.cssText='width:108px;height:108px;object-fit:cover;border-radius:10px;border:1.5px solid #2A3F5F';
+      img.addEventListener('click', function(){ window.open(p.uri); });
+      cell.appendChild(img);
+      var del = el('button',null,'×');
+      del.style.cssText='position:absolute;top:-6px;right:-6px;width:26px;height:26px;border-radius:13px;'
+        +'background:#F87171;color:#fff;font:800 16px Roboto;border:none;line-height:22px;cursor:pointer';
+      del.addEventListener('click', function(){
+        mutate(function(tree){ return T.removePhoto(tree,id,p.id); });
+        drawPhotos();
+      });
+      cell.appendChild(del);
+      var cap = document.createElement('input'); cap.type='text'; cap.value = p.caption||'';
+      cap.placeholder='Legenda...';
+      cap.style.cssText='width:100%;margin-top:6px;font:11px Roboto;color:#E6EDF3;background:#243B5C;'
+        +'border:1.5px solid #2A3F5F;border-radius:6px;padding:6px 8px;height:30px;box-sizing:border-box';
+      cap.addEventListener('input', function(){
+        var v = cap.value;
+        mutateQuiet(function(tree){ return T.setPhotoCaption(tree,id,p.id,v); });
+      });
+      cell.appendChild(cap);
+      grid.appendChild(cell);
+    });
+    photoHost.appendChild(grid);
+
+    var row = el('div','row'); row.style.cssText='gap:8px;margin-top:10px';
+    var cam = button('Tirar foto','sm','CAM',function(){ camInput.click(); });
+    row.appendChild(cam);
+    var gal = button('Galeria','dark sm',null,function(){ galInput.click(); });
+    row.appendChild(gal);
+    photoHost.appendChild(row);
+
+    var camInput = document.createElement('input'); camInput.type='file'; camInput.accept='image/*';
+    camInput.capture = 'environment'; camInput.style.display='none';
+    var galInput = document.createElement('input'); galInput.type='file'; galInput.accept='image/*'; galInput.style.display='none';
+    function onPick(e){
+      var f = e.target.files && e.target.files[0]; if(!f) return;
+      resizeDataUri(f, function(dataUri){
+        var photo = { id:'ph_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+          uri:dataUri, caption:'', takenAt:new Date().toISOString() };
+        mutate(function(tree){ return T.addPhoto(tree,id,photo); });
+        drawPhotos();
+        toast('Foto anexada.');
+      });
+      e.target.value = '';
+    }
+    camInput.addEventListener('change', onPick);
+    galInput.addEventListener('change', onPick);
+    photoHost.appendChild(camInput); photoHost.appendChild(galInput);
+  }
+  drawPhotos();
+
   /* atributos diversos */
   body.appendChild(section('Atributos Diversos'));
   body.appendChild(el('p','hint',

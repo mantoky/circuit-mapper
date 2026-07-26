@@ -8,6 +8,7 @@ import { exportDoc } from './docExport';
 import { exportXlsx } from './xlsxExport';
 import { exportImage, saveToGallery } from './imageExport';
 import { exportJson } from './jsonExport';
+import { resolveTreePhotos } from './photoResolve';
 
 export const FORMATS = [
   { key: 'pdf',  label: 'PDF',   hint: 'Laudo completo com capa',        icon: 'PDF' },
@@ -24,12 +25,21 @@ export const FORMATS = [
 export async function generate(format, ctx) {
   const { tree, header, viewRef, sections } = ctx;
   switch (format) {
-    case 'pdf':  return exportPdf(tree, header, { sections });
-    case 'doc':  return exportDoc(tree, header, { sections });
+    case 'pdf': {
+      const t = await resolveTreePhotos(tree);
+      return exportPdf(t, header, { sections });
+    }
+    case 'doc': {
+      const t = await resolveTreePhotos(tree);
+      return exportDoc(t, header, { sections });
+    }
     case 'xlsx': return exportXlsx(tree, header);
-    case 'png':  return exportImage(viewRef, header, 'png');
-    case 'jpg':  return exportImage(viewRef, header, 'jpg');
-    case 'json': return exportJson(tree, header);
+    case 'png': return exportImage(viewRef, header, 'png');
+    case 'jpg': return exportImage(viewRef, header, 'jpg');
+    case 'json': {
+      const t = await resolveTreePhotos(tree);
+      return exportJson(t, header);
+    }
     default: throw new Error(`Formato nao suportado: ${format}`);
   }
 }

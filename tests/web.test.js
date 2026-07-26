@@ -158,7 +158,7 @@ H.eq(vw.summary.conformityIndex, nativeVal.summary.conformityIndex,
 H.eq(vw.summary.totalKva, 267.06, '4.8 potencia total 267,06 kVA');
 
 const accents = $$('#tree .tr .acc').map((a) => a.style.background);
-H.ok(accents.some((c) => c.includes('229') || c.includes('E5383B') || c.includes('rgb(229')),
+H.ok(accents.some((c) => c.includes('248') || c.includes('F87171') || c.includes('rgb(248')),
   '4.9 linhas nao conformes com barra vermelha');
 H.ok($$('#tree .tr .dot').length >= 9, '4.10 indicadores de status nas linhas com apontamento');
 H.ok($$('#tree .tr .ph').length >= 18, '4.11 chips de fase renderizados nos circuitos');
