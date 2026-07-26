@@ -11,6 +11,7 @@
     "web": "expo start --web",
     "test": "node tests/build-and-test.js",
     "build:web": "node tools/bundleWeb.js",
+    "deploy:vps": "powershell -ExecutionPolicy Bypass -File tools/deployVps.ps1",
     "samples": "node tests/generateSamples.js",
     "build:apk": "eas build -p android --profile preview",
     "build:ios": "eas build -p ios --profile preview",
