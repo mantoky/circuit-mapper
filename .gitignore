@@ -25,5 +25,8 @@ Thumbs.db
 .idea/
 *.local
 
+# Deploy VPS (chaves SSH e configs locais)
+deploy/.vps/
+
 # Local Netlify folder
 .netlify
