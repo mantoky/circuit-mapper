@@ -30,3 +30,4 @@ deploy/.vps/
 
 # Local Netlify folder
 .netlify
+aptos-sync/
