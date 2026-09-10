@@ -1,0 +1,903 @@
+From 7e4b2b054902efa6d9c854ffa5f0cabcfcf92b20 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Thu, 10 Sep 2026 08:05:25 +0000
+Subject: [PATCH] =?UTF-8?q?fix:=20alinhar=20Aptos=20Sync=20aos=20padr?=
+ =?UTF-8?q?=C3=B5es=20de=20a11y,=20seguran=C3=A7a=20e=20PWA?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Corrige zoom bloqueado, labels/autocomplete, hash SHA-256 com migração,
+manifest/theme_color, headers Netlify sem redirect SPA, e unifica a
+paleta do Board Games Pack com a marca Aptos Sync.
+---
+ README.md          |  17 ++++--
+ ab-dashboard.html  |   2 +-
+ batalha-naval.html |   2 +-
+ board-games.html   |  47 ++++++++-------
+ brainhunter.html   |   2 +-
+ connect-four.html  |   2 +-
+ damas.html         |   2 +-
+ docs/PADROES.md    |  46 +++++++++++++++
+ dualtask.html      |   2 +-
+ index.html         | 142 +++++++++++++++++++++++++++++++--------------
+ ludo.html          |   2 +-
+ manifest.json      |  20 ++++---
+ matrix.html        |   2 +-
+ nback.html         |   2 +-
+ netlify.toml       |  13 +++--
+ reversi.html       |   4 +-
+ stroop.html        |   2 +-
+ sudoku.html        |   2 +-
+ sw.js              |   2 +-
+ taskswitch.html    |   2 +-
+ velha.html         |   2 +-
+ version.json       |  10 ++--
+ visualsearch.html  |   2 +-
+ 23 files changed, 227 insertions(+), 102 deletions(-)
+ create mode 100644 docs/PADROES.md
+
+diff --git a/README.md b/README.md
+index 3bd32f7..baf6f23 100644
+--- a/README.md
++++ b/README.md
+@@ -28,6 +28,10 @@ git commit -m "feat: Aptos Sync v1"
+ git push -u origin main
+ ```
+ 
++## Padrões
++
++Checklist de acessibilidade, segurança e PWA em [`docs/PADROES.md`](docs/PADROES.md).
++
+ ## PWA
+ Instalável em Android, iOS e Desktop via browser.
+ - Android: banner automático "Adicionar à tela inicial"
+@@ -37,11 +41,14 @@ Instalável em Android, iOS e Desktop via browser.
+ ## Estrutura
+ ```
+ aptos-sync/
+-├── index.html       # App completo (single-file)
+-├── manifest.json    # PWA manifest
+-├── sw.js            # Service Worker (offline)
+-├── favicon.ico
+-├── icons/           # Ícones PWA (72→512px)
++├── index.html           # App principal (teste cognitivo)
++├── board-games.html     # Hub de jogos de tabuleiro
++├── brainhunter.html     # Mini-app cognitivo
++├── docs/PADROES.md      # Checklist de conformidade
++├── manifest.json        # PWA manifest
++├── sw.js                # Service Worker (offline)
++├── version.json         # Changelog / update modal
++├── icons/               # Ícones PWA (72→512px)
+ ├── firebase.json
+ ├── .firebaserc
+ └── netlify.toml
+diff --git a/ab-dashboard.html b/ab-dashboard.html
+index d99b2e1..a7df962 100644
+--- a/ab-dashboard.html
++++ b/ab-dashboard.html
+@@ -2,7 +2,7 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8"/>
+-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Aptos Sync — Dashboard A/B</title>
+ <style>
+ :root{
+diff --git a/batalha-naval.html b/batalha-naval.html
+index e7b5acf..9d3298d 100644
+--- a/batalha-naval.html
++++ b/batalha-naval.html
+@@ -2,7 +2,7 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8"/>
+-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Batalha Naval</title>
+ <style>
+ :root{--bg:#060818;--card:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);--accent:#06b6d4;--text:#c8d8f0;--muted:#6d7f9b;--hit:#ff6b6b;--miss:#4fc3f7;--ship:#94a3b8}
+diff --git a/board-games.html b/board-games.html
+index 9fe4eb1..a24b753 100644
+--- a/board-games.html
++++ b/board-games.html
+@@ -2,23 +2,26 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8">
+-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <meta name="apple-mobile-web-app-capable" content="yes">
+ <meta name="mobile-web-app-capable" content="yes">
+ <title>Board Games Pack — Jogos de Tabuleiro</title>
++<link rel="preconnect" href="https://fonts.googleapis.com">
++<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
++<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+ <style>
+ /* ── FONTES: stack local — sem dependência de CDN ── */
+ 
+ :root {
+   --bg-primary:    #0a0a0f;
+-  --bg-secondary:  #12121a;
+-  --bg-card:       #1a1a2e;
+-  --bg-card-hover: #222240;
+-  --accent-1: #6c63ff;
++  --bg-secondary:  #0c121e;
++  --bg-card:       #121a2c;
++  --bg-card-hover: #1a2438;
++  --accent-1: #DA7756;
+   --accent-2: #ff6b6b;
+   --accent-3: #4ecdc4;
+   --accent-4: #ffe66d;
+-  --accent-5: #a855f7;
++  --accent-5: #b85e3e;
+   --accent-6: #f97316;
+   --accent-7: #06b6d4;
+   --text-primary:   #ffffff;
+@@ -30,9 +33,13 @@
+ }
+ 
+ *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
++@media (prefers-reduced-motion:reduce){
++  *,*::before,*::after{animation:none!important;transition:none!important;}
++}
++
+ 
+ body {
+-  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
++  font-family:'Sora','IBM Plex Sans','Avenir Next','Segoe UI',sans-serif;
+   background:var(--bg-primary);
+   color:var(--text-primary);
+   min-height:100vh;
+@@ -45,9 +52,9 @@ body {
+   position:fixed;top:0;left:0;width:100%;height:100%;
+   pointer-events:none;z-index:0;
+   background:
+-    radial-gradient(ellipse 600px 600px at 20% 10%,rgba(108,99,255,.08) 0%,transparent 70%),
++    radial-gradient(ellipse 600px 600px at 20% 10%,rgba(218,119,86,.08) 0%,transparent 70%),
+     radial-gradient(ellipse 500px 500px at 80% 80%,rgba(78,205,196,.06) 0%,transparent 70%),
+-    radial-gradient(ellipse 400px 400px at 50% 50%,rgba(168,85,247,.04) 0%,transparent 70%);
++    radial-gradient(ellipse 400px 400px at 50% 50%,rgba(218,119,86,.04) 0%,transparent 70%);
+ }
+ 
+ /* ── LAYOUT ── */
+@@ -70,13 +77,13 @@ header{text-align:center;margin-bottom:52px;}
+   width:80px;height:80px;margin:0 auto 24px;
+   background:linear-gradient(135deg,var(--accent-1),var(--accent-5));
+   border-radius:24px;display:flex;align-items:center;justify-content:center;
+-  font-size:36px;box-shadow:0 8px 32px rgba(108,99,255,.3);
++  font-size:36px;box-shadow:0 8px 32px rgba(218,119,86,.3);
+   animation:float 3s ease-in-out infinite;
+ }
+ @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+ 
+ h1 {
+-  font-family:'Space Grotesk','Inter',sans-serif;
++  font-family:'Sora','Avenir Next',sans-serif;
+   font-size:clamp(2rem,5vw,3.2rem);font-weight:800;
+   background:linear-gradient(135deg,#fff 0%,#a0a0ff 50%,#4ecdc4 100%);
+   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+@@ -91,7 +98,7 @@ h1 {
+ /* ── STATS BAR ── */
+ .stats-bar{display:flex;justify-content:center;gap:32px;margin-top:28px;flex-wrap:wrap;}
+ .stat{text-align:center;}
+-.stat-value{font-family:'Space Grotesk','Inter',sans-serif;font-size:1.5rem;font-weight:700;color:var(--accent-3);}
++.stat-value{font-family:'Sora','Avenir Next',sans-serif;font-size:1.5rem;font-weight:700;color:var(--accent-3);}
+ .stat-label{font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+ 
+ /* ── FILTER BAR ── */
+@@ -103,7 +110,7 @@ h1 {
+   color:var(--text-muted);transition:.2s;
+ }
+ .filter-btn:hover{border-color:rgba(255,255,255,.3);color:var(--text-secondary);}
+-.filter-btn.active{background:rgba(108,99,255,.2);border-color:rgba(108,99,255,.4);color:#9d97ff;}
++.filter-btn.active{background:rgba(218,119,86,.2);border-color:rgba(218,119,86,.4);color:#9d97ff;}
+ 
+ /* ── GAMES GRID ── */
+ .games-grid{
+@@ -138,7 +145,7 @@ h1 {
+ /* Barra de cor no topo do card */
+ .game-card::before{
+   content:'';position:absolute;top:0;left:0;right:0;height:3px;
+-  background:var(--card-accent,#6c63ff);opacity:0;transition:opacity .3s;
++  background:var(--card-accent,#DA7756);opacity:0;transition:opacity .3s;
+ }
+ .game-card:hover::before{opacity:1;}
+ 
+@@ -165,10 +172,10 @@ h1 {
+   width:56px;height:56px;border-radius:16px;
+   display:flex;align-items:center;justify-content:center;
+   font-size:26px;flex-shrink:0;
+-  background:var(--card-accent-bg,rgba(108,99,255,.12));
++  background:var(--card-accent-bg,rgba(218,119,86,.12));
+ }
+ .card-title{
+-  font-family:'Space Grotesk','Inter',sans-serif;
++  font-family:'Sora','Avenir Next',sans-serif;
+   font-size:1.2rem;font-weight:700;color:var(--text-primary);
+ }
+ .card-category{
+@@ -185,7 +192,7 @@ h1 {
+   background:rgba(255,255,255,.05);color:var(--text-secondary);
+   border:1px solid rgba(255,255,255,.07);
+ }
+-.tag-ia       {background:rgba(108,99,255,.15);color:#9d97ff;border-color:rgba(108,99,255,.2);}
++.tag-ia       {background:rgba(218,119,86,.15);color:#9d97ff;border-color:rgba(218,119,86,.2);}
+ .tag-multi    {background:rgba(78,205,196,.15);color:#4ecdc4;border-color:rgba(78,205,196,.2);}
+ .tag-estrategia{background:rgba(255,107,107,.15);color:#ff8a8a;border-color:rgba(255,107,107,.2);}
+ .tag-logica   {background:rgba(255,230,109,.15);color:#ffe66d;border-color:rgba(255,230,109,.2);}
+@@ -194,7 +201,7 @@ h1 {
+ /* ── DIFICULDADE ── */
+ .difficulty{display:flex;gap:4px;margin-left:auto;}
+ .diff-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.1);}
+-.diff-dot.active{background:var(--card-accent,#6c63ff);}
++.diff-dot.active{background:var(--card-accent,#DA7756);}
+ 
+ /* ── MODAL LOADER ── */
+ #game-loader{
+@@ -336,7 +343,7 @@ footer p{color:var(--text-muted);font-size:.8rem;}
+     <!-- Reversi -->
+     <div class="game-card" data-file="reversi.html" data-available="true"
+          data-categories="estrategia,logica,ia"
+-         style="--card-accent:#6c63ff;--card-accent-bg:rgba(108,99,255,.12);"
++         style="--card-accent:#DA7756;--card-accent-bg:rgba(218,119,86,.12);"
+          onclick="openGame('reversi.html','Reversi')">
+       <div class="card-header">
+         <div class="card-icon">⬤</div>
+@@ -525,7 +532,7 @@ function filterCards(btn, filter){
+ 
+ // ── HOVER GLOW (sem getComputedStyle para compat. Safari) ─
+ document.querySelectorAll('.game-card').forEach(card => {
+-  const accent = card.style.getPropertyValue('--card-accent') || '#6c63ff';
++  const accent = card.style.getPropertyValue('--card-accent') || '#DA7756';
+   card.addEventListener('mouseenter', function(){
+     if(this.dataset.available === 'false') return;
+     this.style.boxShadow = `0 20px 60px rgba(0,0,0,.4), 0 0 40px ${accent}22`;
+diff --git a/brainhunter.html b/brainhunter.html
+index 41513cd..f079dbf 100644
+--- a/brainhunter.html
++++ b/brainhunter.html
+@@ -2,7 +2,7 @@
+ <html lang="pt-BR">
+ <head>
+     <meta charset="UTF-8" />
+-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
++    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>BrainHunter Pro: Treino Cognitivo</title>
+     <style>
+         :root {
+diff --git a/connect-four.html b/connect-four.html
+index 1b6004c..3eb9145 100644
+--- a/connect-four.html
++++ b/connect-four.html
+@@ -2,7 +2,7 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8"/>
+-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Connect Four</title>
+ <style>
+ :root{--bg:#060818;--card:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);--accent:#ffe66d;--red:#ff6b6b;--blue:#4fc3f7;--text:#c8d8f0;--muted:#6d7f9b;--ok:#00e676;}
+diff --git a/damas.html b/damas.html
+index cda187d..5f11e5b 100644
+--- a/damas.html
++++ b/damas.html
+@@ -2,7 +2,7 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8"/>
+-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Damas</title>
+ <style>
+ :root{--bg:#060818;--card:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);--accent:#ff6b6b;--text:#c8d8f0;--muted:#6d7f9b;--dark:#121827;--light:#d8b27c;--red:#ff6b6b;--black:#101010;--ok:#00e676}
+diff --git a/docs/PADROES.md b/docs/PADROES.md
+new file mode 100644
+index 0000000..4822ca9
+--- /dev/null
++++ b/docs/PADROES.md
+@@ -0,0 +1,46 @@
++# Padrões — Aptos Sync
++
++Checklist de conformidade aplicado na revisão de [aptossync.netlify.app](https://aptossync.netlify.app/).
++
++## Acessibilidade (WCAG)
++
++| Padrão | Status |
++|---|---|
++| Zoom permitido (`user-scalable` não desabilitado) | Corrigido |
++| Labels associados a inputs (`for`/`id`) | Corrigido |
++| `autocomplete` adequado em login/senha | Corrigido |
++| Contraste de textos secundários | Melhorado |
++| `prefers-reduced-motion` | Adicionado |
++| `aria-label` em botões só-ícone | Corrigido |
++
++## Segurança
++
++| Padrão | Status |
++|---|---|
++| Senha nunca em texto puro no `localStorage` | Já havia hash; reforçado para SHA-256 |
++| Migração transparente do hash legado | Adicionado |
++| Escape de HTML em listas dinâmicas | Corrigido |
++| Headers `X-Frame-Options` / `nosniff` | Mantidos no Netlify |
++
++## PWA
++
++| Padrão | Status |
++|---|---|
++| `theme_color` alinhado ao meta e à marca | Corrigido |
++| `purpose` de ícones válido (`any` / `maskable` separados) | Corrigido |
++| App multi-página: sem redirect SPA que mascara 404 | Corrigido |
++| Cache offline inclui páginas do pack | Mantido |
++
++## Consistência de marca
++
++| Padrão | Status |
++|---|---|
++| Tokens CSS (`--accent`, tipografia) no app principal | Adicionado |
++| Board Games Pack alinhado à paleta Aptos (sem roxo genérico) | Corrigido |
++| Tipografia expressiva (não Inter / system-only) | Melhorado |
++
++## Escopo consciente (mantido)
++
++- Tema escuro do produto principal — identidade estabelecida do Aptos Sync.
++- BrainHunter Pro mantém superfície clara própria (mini-app).
++- Dados de conta/histórico continuam locais no dispositivo (sem backend de auth).
+diff --git a/dualtask.html b/dualtask.html
+index d318c73..35112ad 100644
+--- a/dualtask.html
++++ b/dualtask.html
+@@ -2,7 +2,7 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8"/>
+-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Dual Task</title>
+ <style>
+ :root{--bg:#060818;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--accent:#e879f9;--success:#00e676;--danger:#ff6b6b;--text:#c8d8f0;--muted:#4a6080;--low:#4fc3f7;--high:#ff6b6b;}
+diff --git a/index.html b/index.html
+index 0ff2cdb..fe2b708 100644
+--- a/index.html
++++ b/index.html
+@@ -2,9 +2,13 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8">
+-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Aptos Sync</title>
+ 
++<link rel="preconnect" href="https://fonts.googleapis.com">
++<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
++<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
++
+ <!-- PWA -->
+ <link rel="manifest" href="/manifest.json">
+ <meta name="theme-color" content="#DA7756">
+@@ -51,25 +55,51 @@
+ 
+ <!-- Service Worker registrado no script principal -->
+ <style>
++
++:root{
++  --bg:#0b1220;
++  --bg-deep:#060818;
++  --surface:rgba(10,16,32,0.82);
++  --border:rgba(255,255,255,0.10);
++  --text:#e8eef8;
++  --muted:#7f94b0;
++  --muted-2:#5d7390;
++  --accent:#DA7756;
++  --accent-2:#b85e3e;
++  --cyan:#4fc3f7;
++  --font-display:'Sora','Avenir Next','Trebuchet MS',sans-serif;
++  --font-body:'IBM Plex Sans','Avenir Next','Segoe UI',sans-serif;
++}
+ *,*::before,*::after{box-sizing:border-box;}
+ body{
+-  margin:0;padding:0;background:#060818;color:white;
+-  font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
++  margin:0;padding:0;background:var(--bg-deep);color:var(--text);
++  font-family:var(--font-body);
+   overflow:hidden;height:100vh;width:100vw;
+   user-select:none;-webkit-tap-highlight-color:transparent;
+ }
++.logo-title,.action-btn,#trigger-btn,h2{font-family:var(--font-display);}
++.subtitle,.hint,.input-group label,.user-badge,.logo-sub{color:var(--muted);}
++.hint{color:var(--muted-2);font-size:0.75rem;}
++.input-group label{color:var(--muted);font-size:0.72rem;}
++.sec-btn{color:var(--muted);}
++@media (prefers-reduced-motion:reduce){
++  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;scroll-behavior:auto!important;}
++  .logo-title{animation:none!important;}
++  .spark{display:none!important;}
++}
++
+ #cosmos{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+ #ui-layer{position:absolute;top:0;left:0;width:100%;height:100%;z-index:200;overflow-y:auto;background:transparent;}
+ .screen{display:none;min-height:100vh;width:100%;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px 14px;position:relative;}
+ .screen.active{display:flex;}
+ .screen-inner{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;}
+-.glass{background:rgba(6,8,24,0.72);border:1px solid rgba(255,255,255,0.08);border-radius:20px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);padding:24px 20px;width:100%;}
++.glass{background:var(--surface);border:1px solid var(--border);border-radius:20px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);padding:24px 20px;width:100%;}
+ .logo-title{font-size:2rem;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#a8edff,#DA7756,#a8edff);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 6s linear infinite;}
+ @keyframes shimmer{to{background-position:200% center;}}
+ .logo-sub{font-size:0.7rem;letter-spacing:4px;color:#4a6080;text-transform:uppercase;margin-top:2px;}
+ .logo-wrap{margin-bottom:6px;display:flex;flex-direction:column;align-items:center;}
+ h2{margin:0 0 6px;color:#c8d8f0;font-size:1.05rem;font-weight:600;letter-spacing:0.5px;}
+-.subtitle{font-size:0.82rem;color:#4a6080;margin:0 0 16px;line-height:1.5;}
++.subtitle{font-size:0.82rem;color:var(--muted);margin:0 0 16px;line-height:1.5;}
+ button.action-btn{padding:13px 28px;font-size:1rem;background:linear-gradient(135deg,#DA7756,#b85e3e);border:none;cursor:pointer;border-radius:10px;font-weight:700;color:#fff;box-shadow:0 4px 18px rgba(218,119,86,0.3);transition:transform 0.1s,box-shadow 0.1s;min-width:150px;letter-spacing:0.5px;}
+ button.action-btn:active{transform:scale(0.95);box-shadow:none;}
+ button.action-btn:hover{box-shadow:0 6px 24px rgba(237,184,0,0.45);}
+@@ -402,12 +432,12 @@ button.icon-btn:hover{background:rgba(218,119,86,0.1);border-color:rgba(218,119,
+       <div class="glass">
+         <h2>Identificação</h2>
+         <p class="subtitle">Entre com seus dados para registrar seu desempenho.</p>
+-        <div class="input-group"><label>Nome</label><input type="text" id="inp-name" placeholder="Seu nome" autocomplete="off"/></div>
+-        <div class="input-group"><label>Senha</label><input type="password" id="inp-pass" placeholder="Sua senha" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+-        <div class="field-error" id="login-error"></div>
++        <div class="input-group"><label for="inp-name">Nome</label><input type="text" id="inp-name" name="username" placeholder="Seu nome" autocomplete="username" autocapitalize="words"/></div>
++        <div class="input-group"><label for="inp-pass">Senha</label><input type="password" id="inp-pass" name="password" placeholder="Sua senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
++        <div class="field-error" id="login-error" role="alert" aria-live="polite"></div>
+         <div class="btn-row" style="margin-top:4px;">
+-          <button class="action-btn" onclick="doLogin()">ENTRAR</button>
+-          <button class="sec-btn" onclick="doRegister()">Criar conta</button>
++          <button type="button" class="action-btn" onclick="doLogin()">ENTRAR</button>
++          <button type="button" class="sec-btn" onclick="doRegister()">Criar conta</button>
+         </div>
+       </div>
+       <p class="hint">Dados salvos localmente neste dispositivo.</p>
+@@ -427,7 +457,7 @@ button.icon-btn:hover{background:rgba(218,119,86,0.1);border-color:rgba(218,119,
+           <div style="display:flex;gap:6px;align-items:center;">
+             <div class="time-badge" id="time-badge-top">45s</div>
+             <div class="diff-badge" id="diff-badge-top">MÉDIO</div>
+-            <button class="icon-btn" onclick="showConfig()" title="Configurações">⚙️</button>
++            <button type="button" class="icon-btn" onclick="showConfig()" title="Configurações" aria-label="Configurações">⚙</button>
+           </div>
+         </div>
+         <p class="subtitle" style="text-align:left;margin-bottom:10px;">
+@@ -444,9 +474,9 @@ button.icon-btn:hover{background:rgba(218,119,86,0.1);border-color:rgba(218,119,
+         <p id="target-desc" style="color:#DA7756;font-weight:700;margin:0 0 12px;font-size:0.85rem;letter-spacing:1px;"></p>
+         <button class="action-btn" id="start-btn" onclick="prepareGame()" style="width:100%;margin-bottom:10px;">INICIAR TESTE</button>
+         <div class="btn-row" style="margin-top:0;">
+-          <button class="sec-btn" onclick="showHistory()">📋 Histórico</button>
+-          <button class="sec-btn" onclick="showChart()">📈 Evolução</button>
+-          <button class="sec-btn" onclick="openGames()">🎮 Jogos</button>
++          <button type="button" class="sec-btn" onclick="showHistory()">Histórico</button>
++          <button type="button" class="sec-btn" onclick="showChart()">Evolução</button>
++          <button type="button" class="sec-btn" onclick="openGames()">Jogos</button>
+           <button class="sec-btn" onclick="doLogout()">Sair</button>
+         </div>
+       </div>
+@@ -458,8 +488,8 @@ button.icon-btn:hover{background:rgba(218,119,86,0.1);border-color:rgba(218,119,
+     <div class="screen-inner">
+       <div class="glass">
+         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+-          <h2 style="margin:0;">⚙️ Configurações</h2>
+-          <button class="icon-btn" onclick="backToStart()">✕</button>
++          <h2 style="margin:0;">Configurações</h2>
++          <button type="button" class="icon-btn" onclick="backToStart()" aria-label="Fechar configurações">✕</button>
+         </div>
+ 
+         <!-- DOIS KNOBS -->
+@@ -505,9 +535,9 @@ button.icon-btn:hover{background:rgba(218,119,86,0.1);border-color:rgba(218,119,
+         <!-- MUDAR SENHA -->
+         <div class="config-section">
+           <div class="config-section-title">Alterar Senha</div>
+-          <div class="input-group" style="margin-bottom:8px;"><label>Senha Atual</label><input type="password" id="cfg-pass-current" placeholder="Digite a senha atual" autocomplete="off"/></div>
+-          <div class="input-group" style="margin-bottom:8px;"><label>Nova Senha</label><input type="password" id="cfg-pass-new" placeholder="Mínimo 4 caracteres" autocomplete="off"/></div>
+-          <div class="input-group"><label>Confirmar Nova Senha</label><input type="password" id="cfg-pass-confirm" placeholder="Repita a nova senha" autocomplete="off"/></div>
++          <div class="input-group" style="margin-bottom:8px;"><label for="cfg-pass-current">Senha Atual</label><input type="password" id="cfg-pass-current" placeholder="Digite a senha atual" autocomplete="current-password"/></div>
++          <div class="input-group" style="margin-bottom:8px;"><label for="cfg-pass-new">Nova Senha</label><input type="password" id="cfg-pass-new" placeholder="Mínimo 4 caracteres" autocomplete="new-password"/></div>
++          <div class="input-group"><label for="cfg-pass-confirm">Confirmar Nova Senha</label><input type="password" id="cfg-pass-confirm" placeholder="Repita a nova senha" autocomplete="new-password"/></div>
+           <div class="config-msg field-error" id="cfg-pass-msg"></div>
+           <button class="sec-btn" onclick="changePassword()" style="width:100%;">Salvar nova senha</button>
+         </div>
+@@ -529,8 +559,8 @@ button.icon-btn:hover{background:rgba(218,119,86,0.1);border-color:rgba(218,119,
+         <div class="raw-data" id="raw-data"></div>
+         <div class="btn-row">
+           <button class="action-btn" onclick="playAgain()">Novo Teste</button>
+-          <button class="sec-btn" onclick="showChart()">📈 Evolução</button>
+-          <button class="sec-btn" onclick="showHistory()">📋 Histórico</button>
++          <button type="button" class="sec-btn" onclick="showChart()">Evolução</button>
++          <button type="button" class="sec-btn" onclick="showHistory()">Histórico</button>
+         </div>
+       </div>
+     </div>
+@@ -540,7 +570,7 @@ button.icon-btn:hover{background:rgba(218,119,86,0.1);border-color:rgba(218,119,
+   <div id="chart-screen" class="screen">
+     <div class="screen-inner">
+       <div class="glass">
+-        <h2>📈 Evolução</h2>
++        <h2>Evolução</h2>
+         <p id="chart-subtitle" class="subtitle" style="margin-bottom:10px;"></p>
+         <canvas id="perf-canvas" height="190"></canvas>
+         <div class="chart-legend">
+@@ -551,8 +581,8 @@ button.icon-btn:hover{background:rgba(218,119,86,0.1);border-color:rgba(218,119,
+           <div class="legend-item"><div class="legend-dot" style="background:transparent;border:1px dashed #333;"></div>Meta 70%</div>
+         </div>
+         <div class="btn-row">
+-          <button class="sec-btn" onclick="showHistory()">📋 Histórico</button>
+-          <button class="sec-btn" onclick="backToStart()">← Voltar</button>
++          <button type="button" class="sec-btn" onclick="showHistory()">Histórico</button>
++          <button type="button" class="sec-btn" onclick="backToStart()">Voltar</button>
+         </div>
+       </div>
+     </div>
+@@ -562,13 +592,13 @@ button.icon-btn:hover{background:rgba(218,119,86,0.1);border-color:rgba(218,119,
+   <div id="history-screen" class="screen">
+     <div class="screen-inner">
+       <div class="glass">
+-        <h2>📋 Histórico</h2>
++        <h2>Histórico</h2>
+         <p id="history-subtitle" class="subtitle" style="margin-bottom:10px;"></p>
+         <div class="history-list" id="history-list"></div>
+         <div class="btn-row">
+-          <button class="sec-btn" onclick="showChart()">📈 Evolução</button>
+-          <button class="sec-btn" onclick="backToStart()">← Voltar</button>
+-          <button class="sec-btn" style="color:#ff6b6b;border-color:#3a2020;" onclick="confirmClear()">🗑 Limpar</button>
++          <button type="button" class="sec-btn" onclick="showChart()">Evolução</button>
++          <button type="button" class="sec-btn" onclick="backToStart()">Voltar</button>
++          <button type="button" class="sec-btn" style="color:#ff6b6b;border-color:#3a2020;" onclick="confirmClear()">Limpar</button>
+         </div>
+       </div>
+     </div>
+@@ -579,7 +609,7 @@ button.icon-btn:hover{background:rgba(218,119,86,0.1);border-color:rgba(218,119,
+ <!-- A/B TEST MODAL -->
+ <div id="ab-modal">
+   <div class="ab-card">
+-    <div class="ab-pill">✨ Novidade disponível</div>
++    <div class="ab-pill">Novidade disponível</div>
+     <div class="ab-title">Board Games Pack chegou!</div>
+     <div class="ab-desc">7 jogos de tabuleiro clássicos foram integrados ao Aptos Sync. Quer testar a nova versão?</div>
+     <div class="ab-preview">
+@@ -728,7 +758,20 @@ const triggerBtn=document.getElementById('trigger-btn');
+ function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active');document.getElementById('ui-layer').scrollTop=0;}
+ 
+ /* ══════ STORAGE ══════ */
+-function hashPass(p){let h=0;for(let i=0;i<p.length;i++)h=Math.imul(31,h)+p.charCodeAt(i)|0;return h.toString(36);}
++function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
++function hashPassLegacy(p){let h=0;for(let i=0;i<p.length;i++)h=Math.imul(31,h)+p.charCodeAt(i)|0;return h.toString(36);}
++async function hashPass(p){
++  const enc=new TextEncoder().encode('aptos-sync-v2:'+p);
++  const buf=await crypto.subtle.digest('SHA-256',enc);
++  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
++}
++async function verifyAndUpgradePass(users,key,pass){
++  const stored=users[key].passHash;
++  const neo=await hashPass(pass);
++  if(stored===neo)return true;
++  if(stored===hashPassLegacy(pass)){users[key].passHash=neo;saveUsers(users);return true;}
++  return false;
++}
+ function getUsers(){try{return JSON.parse(localStorage.getItem('as_users')||'{}');}catch{return{};}}
+ function saveUsers(u){localStorage.setItem('as_users',JSON.stringify(u));}
+ function getHistory(n){try{return JSON.parse(localStorage.getItem('as_hist_'+n)||'[]');}catch{return[];}}
+@@ -738,13 +781,13 @@ function saveUserPref(n,p){localStorage.setItem('as_pref_'+n,JSON.stringify(p));
+ 
+ /* ══════ AUTH ══════ */
+ function setLoginError(m){document.getElementById('login-error').innerText=m;}
+-function doLogin(){
++async function doLogin(){
+   const name=document.getElementById('inp-name').value.trim();
+   const pass=document.getElementById('inp-pass').value;
+   if(!name||!pass){setLoginError('Preencha nome e senha.');return;}
+   const users=getUsers(),key=name.toLowerCase();
+   if(!users[key]){setLoginError('Usuário não encontrado. Crie uma conta.');return;}
+-  if(users[key].passHash!==hashPass(pass)){setLoginError('Senha incorreta.');return;}
++  if(!(await verifyAndUpgradePass(users,key,pass))){setLoginError('Senha incorreta.');return;}
+   setLoginError('');
+   currentUser={name:users[key].displayName};
+   const pref=getUserPref(currentUser.name);
+@@ -753,16 +796,30 @@ function doLogin(){
+   currentGameDuration=TIME_MIN+currentTimeIdx*TIME_STEP;
+   enterApp();
+ }
+-function doRegister(){
++async function doRegister(){
+   const name=document.getElementById('inp-name').value.trim();
+   const pass=document.getElementById('inp-pass').value;
+   if(!name||pass.length<4){setLoginError('Nome e senha (mín. 4 caracteres) obrigatórios.');return;}
+   const users=getUsers(),key=name.toLowerCase();
+   if(users[key]){setLoginError('Nome já cadastrado. Faça login.');return;}
+-  users[key]={displayName:name,passHash:hashPass(pass)};
++  users[key]={displayName:name,passHash:await hashPass(pass)};
+   saveUsers(users);setLoginError('');currentUser={name};enterApp();
+ }
+-function doLogout(){currentUser=null;document.getElementById('inp-pass').value='';setLoginError('');showScreen('login-screen');}
++function dismissOverlays(){
++  const ab=document.getElementById('ab-modal');
++  if(ab){ab.classList.remove('visible');ab.style.display='none';}
++  const upd=document.getElementById('update-modal');
++  if(upd){upd.classList.remove('visible');upd.style.display='none';}
++  const games=document.getElementById('games-overlay');
++  if(games)games.classList.remove('open');
++}
++function doLogout(){
++  dismissOverlays();
++  currentUser=null;
++  document.getElementById('inp-pass').value='';
++  setLoginError('');
++  showScreen('login-screen');
++}
+ function enterApp(){
+   document.getElementById('logged-name').innerText=currentUser.name;
+   updateBadges();
+@@ -950,7 +1007,7 @@ function showConfig(){
+   setTimeout(()=>{setDiffLevel(currentDiffIdx);setTimeLevel(currentTimeIdx);},60);
+ }
+ 
+-function changePassword(){
++async function changePassword(){
+   const curr=document.getElementById('cfg-pass-current').value;
+   const nw=document.getElementById('cfg-pass-new').value;
+   const conf=document.getElementById('cfg-pass-confirm').value;
+@@ -959,10 +1016,11 @@ function changePassword(){
+   if(nw.length<4){msg.innerText='Nova senha deve ter mínimo 4 caracteres.';return;}
+   if(nw!==conf){msg.innerText='As senhas não coincidem.';return;}
+   const users=getUsers(),key=currentUser.name.toLowerCase();
+-  if(users[key].passHash!==hashPass(curr)){msg.innerText='Senha atual incorreta.';return;}
+-  users[key].passHash=hashPass(nw);saveUsers(users);
+-  msg.style.color='#00e676';msg.innerText='✓ Senha alterada com sucesso!';
++  if(!(await verifyAndUpgradePass(users,key,curr))){msg.innerText='Senha atual incorreta.';return;}
++  users[key].passHash=await hashPass(nw);saveUsers(users);
++  msg.style.color='#00e676';msg.innerText='Senha alterada com sucesso!';
+   ['cfg-pass-current','cfg-pass-new','cfg-pass-confirm'].forEach(id=>document.getElementById(id).value='');
++  setTimeout(()=>{msg.innerText='';msg.style.color='';},2500);
+ }
+ 
+ /* ══════ JOGO ══════ */
+@@ -1136,7 +1194,7 @@ function showHistory(){
+   document.getElementById('history-subtitle').innerText=`${currentUser.name} · ${hist.length} teste${hist.length!==1?'s':''}`;
+   const list=document.getElementById('history-list');
+   if(!hist.length){list.innerHTML='<div class="history-empty">Nenhum teste registrado ainda.</div>';}
+-  else{list.innerHTML=[...hist].reverse().map((h,i)=>{const n=hist.length-i;const ac=h.approved?'badge-approved':'badge-failed';const cc=h.approved?'#00e676':'#ff6b6b';const info=[h.diffName,h.duration?h.duration+'s':null].filter(Boolean).join(' · ');return`<div class="history-item"><span class="h-num">#${n}</span><div style="flex:1;margin:0 8px;"><div class="h-date">${h.date}${info?' · '+info:''}</div><div style="font-size:0.66rem;color:#2a3a50;margin-top:2px;">R:${h.reaction}% A:${h.attention}% I:${h.impulse}% C:${h.concentration}%</div></div><span class="h-conc" style="color:${cc};">${h.concentration}%</span><span class="h-badge ${ac}">${h.approved?'APTO':'INAPTO'}</span></div>`;}).join('');}
++  else{list.innerHTML=[...hist].reverse().map((h,i)=>{const n=hist.length-i;const ac=h.approved?'badge-approved':'badge-failed';const cc=h.approved?'#00e676':'#ff6b6b';const info=[h.diffName,h.duration?h.duration+'s':null].filter(Boolean).join(' · ');return`<div class="history-item"><span class="h-num">#${n}</span><div style="flex:1;margin:0 8px;"><div class="h-date">${escapeHtml(h.date)}${info?' · '+escapeHtml(info):''}</div><div style="font-size:0.66rem;color:#2a3a50;margin-top:2px;">R:${h.reaction}% A:${h.attention}% I:${h.impulse}% C:${h.concentration}%</div></div><span class="h-conc" style="color:${cc};">${h.concentration}%</span><span class="h-badge ${ac}">${h.approved?'APTO':'INAPTO'}</span></div>`;}).join('');}
+   showScreen('history-screen');
+ }
+ 
+@@ -1182,7 +1240,7 @@ function drawChart(hist){
+ /* ══════════════════════════════════════════════════════
+    SISTEMA DE ATUALIZAÇÃO
+ ══════════════════════════════════════════════════════ */
+-const APP_VERSION = '1.6.1';
++const APP_VERSION = '1.6.2';
+ let swRegistration = null;
+ let updatePending = false;
+ 
+@@ -1237,7 +1295,7 @@ function showUpdateModal(data) {
+   const list    = document.getElementById('update-changelog');
+   label.innerText = 'v' + data.version;
+   list.innerHTML  = (data.changelog || [])
+-    .map(item => `<li>${item}</li>`).join('');
++    .map(item => `<li>${escapeHtml(item)}</li>`).join('');
+   modal.style.display = 'flex';
+   requestAnimationFrame(() => requestAnimationFrame(() => modal.classList.add('visible')));
+ }
+diff --git a/ludo.html b/ludo.html
+index 6ef2ed4..0bb6ce1 100644
+--- a/ludo.html
++++ b/ludo.html
+@@ -2,7 +2,7 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8"/>
+-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Ludo</title>
+ <style>
+ :root{--bg:#060818;--card:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);--accent:#4ecdc4;--text:#c8d8f0;--muted:#6d7f9b;--red:#ff6b6b;--yellow:#ffe66d;--green:#00e676;--blue:#4fc3f7}
+diff --git a/manifest.json b/manifest.json
+index d2e0240..0f46edb 100644
+--- a/manifest.json
++++ b/manifest.json
+@@ -6,19 +6,21 @@
+   "display": "standalone",
+   "orientation": "portrait",
+   "background_color": "#060818",
+-  "theme_color": "#EDB800",
++  "theme_color": "#DA7756",
+   "lang": "pt-BR",
+   "scope": "/",
+   "categories": ["health", "productivity"],
+   "icons": [
+-    { "src": "/icons/icon-72x72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any maskable" },
+-    { "src": "/icons/icon-96x96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "any maskable" },
+-    { "src": "/icons/icon-128x128.png", "sizes": "128x128", "type": "image/png", "purpose": "any maskable" },
+-    { "src": "/icons/icon-144x144.png", "sizes": "144x144", "type": "image/png", "purpose": "any maskable" },
+-    { "src": "/icons/icon-152x152.png", "sizes": "152x152", "type": "image/png", "purpose": "any maskable" },
+-    { "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+-    { "src": "/icons/icon-384x384.png", "sizes": "384x384", "type": "image/png", "purpose": "any maskable" },
+-    { "src": "/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
++    { "src": "/icons/icon-72x72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any" },
++    { "src": "/icons/icon-96x96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "any" },
++    { "src": "/icons/icon-128x128.png", "sizes": "128x128", "type": "image/png", "purpose": "any" },
++    { "src": "/icons/icon-144x144.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
++    { "src": "/icons/icon-152x152.png", "sizes": "152x152", "type": "image/png", "purpose": "any" },
++    { "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
++    { "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
++    { "src": "/icons/icon-384x384.png", "sizes": "384x384", "type": "image/png", "purpose": "any" },
++    { "src": "/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
++    { "src": "/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+   ],
+   "shortcuts": [
+     {
+diff --git a/matrix.html b/matrix.html
+index 2696a32..9f9ebc3 100644
+--- a/matrix.html
++++ b/matrix.html
+@@ -2,7 +2,7 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8"/>
+-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Matrix Sequence</title>
+ <style>
+ :root{--bg:#060818;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--accent:#a78bfa;--success:#00e676;--danger:#ff6b6b;--text:#c8d8f0;--muted:#4a6080;}
+diff --git a/nback.html b/nback.html
+index e853530..a41d031 100644
+--- a/nback.html
++++ b/nback.html
+@@ -2,7 +2,7 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8"/>
+-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>N-Back Lite</title>
+ <style>
+ :root{--bg:#060818;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--accent:#4fc3f7;--success:#00e676;--danger:#ff6b6b;--text:#c8d8f0;--muted:#4a6080;}
+diff --git a/netlify.toml b/netlify.toml
+index 445c0f5..c755bac 100644
+--- a/netlify.toml
++++ b/netlify.toml
+@@ -2,10 +2,8 @@
+   publish = "."
+   command = ""
+ 
+-[[redirects]]
+-  from = "/*"
+-  to = "/index.html"
+-  status = 200
++# App multi-página: não usar SPA catch-all /* → index.html
++# (quebra/oculta 404 de assets e páginas do pack cognitivo).
+ 
+ [[headers]]
+   for = "/*.html"
+@@ -13,6 +11,8 @@
+     Cache-Control = "no-cache, no-store, must-revalidate"
+     X-Frame-Options = "SAMEORIGIN"
+     X-Content-Type-Options = "nosniff"
++    Referrer-Policy = "strict-origin-when-cross-origin"
++    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+ 
+ [[headers]]
+   for = "/sw.js"
+@@ -30,3 +30,8 @@
+   [headers.values]
+     Cache-Control = "public, max-age=3600"
+     Content-Type = "application/manifest+json"
++
++[[headers]]
++  for = "/version.json"
++  [headers.values]
++    Cache-Control = "no-cache"
+diff --git a/reversi.html b/reversi.html
+index 11b57a2..709f4e9 100644
+--- a/reversi.html
++++ b/reversi.html
+@@ -2,10 +2,10 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8"/>
+-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Reversi</title>
+ <style>
+-:root{--bg:#060818;--card:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);--accent:#6c63ff;--text:#c8d8f0;--muted:#6d7f9b;--green:#0f7a45;--ok:#00e676}
++:root{--bg:#060818;--card:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);--accent:#DA7756;--text:#c8d8f0;--muted:#6d7f9b;--green:#0f7a45;--ok:#00e676}
+ *{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',system-ui,sans-serif;background:radial-gradient(circle at top,#17133a,var(--bg) 60%);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:14px;user-select:none}
+ .wrap{width:100%;max-width:430px;text-align:center}.close{position:fixed;top:14px;right:14px;width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--muted);font-weight:900;cursor:pointer}
+ h1{font-size:2rem;font-weight:900;background:linear-gradient(135deg,var(--accent),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.sub{color:var(--muted);font-size:.86rem;margin:8px 0 12px;line-height:1.45}
+diff --git a/stroop.html b/stroop.html
+index c4b1ed0..6e484e1 100644
+--- a/stroop.html
++++ b/stroop.html
+@@ -2,7 +2,7 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8"/>
+-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Stroop Color</title>
+ <style>
+ :root{--bg:#060818;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--text:#c8d8f0;--muted:#4a6080;
+diff --git a/sudoku.html b/sudoku.html
+index 539c7a1..6df5089 100644
+--- a/sudoku.html
++++ b/sudoku.html
+@@ -2,7 +2,7 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8"/>
+-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Sudoku</title>
+ <style>
+ :root{--bg:#060818;--card:rgba(255,255,255,.05);--border:rgba(255,255,255,.12);--accent:#f97316;--text:#c8d8f0;--muted:#6d7f9b;--bad:#ff6b6b;--ok:#00e676}
+diff --git a/sw.js b/sw.js
+index 6156e27..782c2be 100644
+--- a/sw.js
++++ b/sw.js
+@@ -1,4 +1,4 @@
+-const CACHE_NAME = 'aptos-sync-v1.6.1';
++const CACHE_NAME = 'aptos-sync-v1.6.2';
+ const ASSETS = [
+   '/',
+   '/index.html',
+diff --git a/taskswitch.html b/taskswitch.html
+index 4176b4b..fbed5e6 100644
+--- a/taskswitch.html
++++ b/taskswitch.html
+@@ -2,7 +2,7 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8"/>
+-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Task Switch</title>
+ <style>
+ :root{--bg:#060818;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--accent:#34d399;--danger:#ff6b6b;--text:#c8d8f0;--muted:#4a6080;--taskA:#34d399;--taskB:#f59e0b;}
+diff --git a/velha.html b/velha.html
+index 4fef4ad..846ca5d 100644
+--- a/velha.html
++++ b/velha.html
+@@ -2,7 +2,7 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8"/>
+-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Jogo da Velha+</title>
+ <style>
+ :root{--bg:#060818;--card:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);--accent:#a855f7;--x:#4fc3f7;--o:#ff6b6b;--text:#c8d8f0;--muted:#6d7f9b;--ok:#00e676}
+diff --git a/version.json b/version.json
+index dc90b1e..d1c73b8 100644
+--- a/version.json
++++ b/version.json
+@@ -1,9 +1,9 @@
+ {
+-  "version": "1.6.1",
+-  "date": "2026-06-14",
++  "version": "1.6.2",
++  "date": "2026-09-10",
+   "changelog": [
+-    "Board Games Pack completo com 7 jogos jogaveis",
+-    "Corrigidos links quebrados do hub de jogos",
+-    "Novas paginas incluidas no cache offline da PWA"
++    "Padroes de acessibilidade: zoom, labels, contraste e reduced-motion",
++    "Hash de senha SHA-256 com migracao do algoritmo legado",
++    "PWA e Netlify: theme_color, icones e headers sem redirect SPA"
+   ]
+ }
+diff --git a/visualsearch.html b/visualsearch.html
+index 5469fbe..f90870e 100644
+--- a/visualsearch.html
++++ b/visualsearch.html
+@@ -2,7 +2,7 @@
+ <html lang="pt-BR">
+ <head>
+ <meta charset="UTF-8"/>
+-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Visual Search</title>
+ <style>
+ :root{--bg:#060818;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--accent:#fb923c;--success:#00e676;--danger:#ff6b6b;--text:#c8d8f0;--muted:#4a6080;}
+-- 
+2.43.0
+

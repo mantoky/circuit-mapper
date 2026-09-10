@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Board Games Pack — Jogos de Tabuleiro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ── FONTES: stack local — sem dependência de CDN ── */
+
+:root {
+  --bg-primary:    #0a0a0f;
+  --bg-secondary:  #0c121e;
+  --bg-card:       #121a2c;
+  --bg-card-hover: #1a2438;
+  --accent-1: #DA7756;
+  --accent-2: #ff6b6b;
+  --accent-3: #4ecdc4;
+  --accent-4: #ffe66d;
+  --accent-5: #b85e3e;
+  --accent-6: #f97316;
+  --accent-7: #06b6d4;
+  --text-primary:   #ffffff;
+  --text-secondary: #a0a0b8;
+  --text-muted:     #6b6b80;
+  --border: rgba(255,255,255,0.06);
+  --radius:    20px;
+  --radius-sm: 12px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;}
+}
+
+
+body {
+  font-family:'Sora','IBM Plex Sans','Avenir Next','Segoe UI',sans-serif;
+  background:var(--bg-primary);
+  color:var(--text-primary);
+  min-height:100vh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── BACKGROUND ── */
+.bg-pattern {
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 600px 600px at 20% 10%,rgba(218,119,86,.08) 0%,transparent 70%),
+    radial-gradient(ellipse 500px 500px at 80% 80%,rgba(78,205,196,.06) 0%,transparent 70%),
+    radial-gradient(ellipse 400px 400px at 50% 50%,rgba(218,119,86,.04) 0%,transparent 70%);
+}
+
+/* ── LAYOUT ── */
+.container{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:40px 20px 80px;}
+
+/* ── BACK BTN ── */
+.back-btn {
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  color:var(--text-secondary);padding:8px 16px;border-radius:50px;
+  font-size:.82rem;font-weight:600;cursor:pointer;
+  transition:.2s;margin-bottom:32px;
+}
+.back-btn:hover{background:rgba(255,255,255,.1);color:var(--text-primary);}
+
+/* ── HEADER ── */
+header{text-align:center;margin-bottom:52px;}
+
+.logo-icon {
+  width:80px;height:80px;margin:0 auto 24px;
+  background:linear-gradient(135deg,var(--accent-1),var(--accent-5));
+  border-radius:24px;display:flex;align-items:center;justify-content:center;
+  font-size:36px;box-shadow:0 8px 32px rgba(218,119,86,.3);
+  animation:float 3s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+
+h1 {
+  font-family:'Sora','Avenir Next',sans-serif;
+  font-size:clamp(2rem,5vw,3.2rem);font-weight:800;
+  background:linear-gradient(135deg,#fff 0%,#a0a0ff 50%,#4ecdc4 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:12px;letter-spacing:-1px;
+}
+
+.subtitle{
+  color:var(--text-secondary);font-size:clamp(.9rem,2vw,1.1rem);
+  max-width:500px;margin:0 auto;line-height:1.6;
+}
+
+/* ── STATS BAR ── */
+.stats-bar{display:flex;justify-content:center;gap:32px;margin-top:28px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat-value{font-family:'Sora','Avenir Next',sans-serif;font-size:1.5rem;font-weight:700;color:var(--accent-3);}
+.stat-label{font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:28px;}
+.filter-btn{
+  padding:6px 16px;border-radius:50px;font-size:.75rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.5px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.1);background:transparent;
+  color:var(--text-muted);transition:.2s;
+}
+.filter-btn:hover{border-color:rgba(255,255,255,.3);color:var(--text-secondary);}
+.filter-btn.active{background:rgba(218,119,86,.2);border-color:rgba(218,119,86,.4);color:#9d97ff;}
+
+/* ── GAMES GRID ── */
+.games-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));
+  gap:24px;
+}
+
+/* ── GAME CARD ── */
+.game-card {
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:32px 28px;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:transform .35s cubic-bezier(.175,.885,.32,1.275),
+              box-shadow .35s ease,
+              border-color .35s ease,
+              background .35s ease;
+  /* Animação de entrada — separada de hover para não conflitar */
+  opacity:0;
+  animation:cardIn .5s forwards;
+}
+.game-card:hover{
+  transform:translateY(-6px);
+  border-color:rgba(255,255,255,.14);
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+  background:var(--bg-card-hover);
+}
+.game-card:active{transform:translateY(-2px) scale(.98);}
+.game-card[data-available="false"]{opacity:.5;cursor:not-allowed;}
+.game-card[data-available="false"]:hover{transform:none;box-shadow:none;}
+
+/* Barra de cor no topo do card */
+.game-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--card-accent,#DA7756);opacity:0;transition:opacity .3s;
+}
+.game-card:hover::before{opacity:1;}
+
+/* Badge "Em breve" */
+.soon-badge{
+  position:absolute;top:14px;right:14px;
+  font-size:.62rem;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;padding:3px 10px;
+  border-radius:20px;background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);color:var(--text-muted);
+}
+
+/* Ripple */
+.ripple{
+  position:absolute;border-radius:50%;transform:scale(0);
+  animation:ripple-anim .5s linear;background:rgba(255,255,255,.12);
+  pointer-events:none;
+}
+@keyframes ripple-anim{to{transform:scale(4);opacity:0;}}
+
+/* ── CARD CONTEÚDO ── */
+.card-header{display:flex;align-items:center;gap:16px;margin-bottom:16px;}
+.card-icon{
+  width:56px;height:56px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;flex-shrink:0;
+  background:var(--card-accent-bg,rgba(218,119,86,.12));
+}
+.card-title{
+  font-family:'Sora','Avenir Next',sans-serif;
+  font-size:1.2rem;font-weight:700;color:var(--text-primary);
+}
+.card-category{
+  font-size:.7rem;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:1.5px;margin-top:2px;
+}
+.card-description{color:var(--text-secondary);font-size:.9rem;line-height:1.6;margin-bottom:20px;}
+
+/* ── TAGS ── */
+.card-tags{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.tag{
+  padding:4px 12px;border-radius:20px;font-size:.68rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.5px;
+  background:rgba(255,255,255,.05);color:var(--text-secondary);
+  border:1px solid rgba(255,255,255,.07);
+}
+.tag-ia       {background:rgba(218,119,86,.15);color:#9d97ff;border-color:rgba(218,119,86,.2);}
+.tag-multi    {background:rgba(78,205,196,.15);color:#4ecdc4;border-color:rgba(78,205,196,.2);}
+.tag-estrategia{background:rgba(255,107,107,.15);color:#ff8a8a;border-color:rgba(255,107,107,.2);}
+.tag-logica   {background:rgba(255,230,109,.15);color:#ffe66d;border-color:rgba(255,230,109,.2);}
+.tag-memoria  {background:rgba(168,85,247,.15);color:#c084fc;border-color:rgba(168,85,247,.2);}
+
+/* ── DIFICULDADE ── */
+.difficulty{display:flex;gap:4px;margin-left:auto;}
+.diff-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.1);}
+.diff-dot.active{background:var(--card-accent,#DA7756);}
+
+/* ── MODAL LOADER ── */
+#game-loader{
+  position:fixed;inset:0;background:rgba(10,10,15,.95);
+  display:none;align-items:center;justify-content:center;
+  flex-direction:column;gap:16px;z-index:9000;
+}
+#game-loader.open{display:flex;}
+.loader-spinner{
+  width:48px;height:48px;border:3px solid rgba(255,255,255,.1);
+  border-top-color:var(--accent-1);border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loader-text{color:var(--text-secondary);font-size:.9rem;}
+
+/* ── ANIMAÇÃO CARDS ── */
+@keyframes cardIn{to{opacity:1;transform:translateY(0);}}
+.game-card:nth-child(1){animation-delay:.05s;}
+.game-card:nth-child(2){animation-delay:.10s;}
+.game-card:nth-child(3){animation-delay:.15s;}
+.game-card:nth-child(4){animation-delay:.20s;}
+.game-card:nth-child(5){animation-delay:.25s;}
+.game-card:nth-child(6){animation-delay:.30s;}
+.game-card:nth-child(7){animation-delay:.35s;}
+
+/* ── FOOTER ── */
+footer{text-align:center;margin-top:60px;padding-top:40px;border-top:1px solid var(--border);}
+footer p{color:var(--text-muted);font-size:.8rem;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .container{padding:20px 14px 60px;}
+  header{margin-bottom:36px;}
+  .games-grid{gap:14px;}
+  .game-card{padding:22px 18px;}
+  .stats-bar{gap:20px;}
+}
+@media(max-width:400px){
+  .card-header{flex-wrap:wrap;}
+  .difficulty{margin-left:0;margin-top:8px;}
+}
+</style>
+</head>
+<body>
+<div class="bg-pattern"></div>
+
+<!-- LOADER enquanto jogo carrega -->
+<div id="game-loader">
+  <div class="loader-spinner"></div>
+  <div class="loader-text" id="loader-text">Carregando jogo...</div>
+</div>
+
+<div class="container">
+
+  <!-- Botão voltar ao Aptos Sync -->
+  <button class="back-btn" onclick="closeHub()">← Voltar ao Aptos Sync</button>
+
+  <header>
+    <div class="logo-icon">♟</div>
+    <h1>Board Games Pack</h1>
+    <p class="subtitle">7 jogos de tabuleiro clássicos para estimular cognição, estratégia e raciocínio lógico</p>
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-value" id="stat-available">7</div>
+        <div class="stat-label">Jogos</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">IA</div>
+        <div class="stat-label">Oponente</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">100%</div>
+        <div class="stat-label">Gratuito</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Filtro por categoria -->
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="todos" onclick="filterCards(this,'todos')">Todos</button>
+    <button class="filter-btn" data-filter="estrategia" onclick="filterCards(this,'estrategia')">Estratégia</button>
+    <button class="filter-btn" data-filter="logica" onclick="filterCards(this,'logica')">Lógica</button>
+    <button class="filter-btn" data-filter="multi" onclick="filterCards(this,'multi')">Multi-jogador</button>
+  </div>
+
+  <div class="games-grid" id="games-grid">
+
+    <!-- Damas -->
+    <div class="game-card" data-file="damas.html" data-available="true"
+         data-categories="estrategia,ia"
+         style="--card-accent:#ff6b6b;--card-accent-bg:rgba(255,107,107,.12);"
+         onclick="openGame('damas.html','Damas')">
+      <div class="card-header">
+        <div class="card-icon">♟</div>
+        <div>
+          <div class="card-title">Damas</div>
+          <div class="card-category">Tabuleiro Clássico</div>
+        </div>
+        <div class="difficulty">
+          <div class="diff-dot active"></div>
+          <div class="diff-dot active"></div>
+          <div class="diff-dot"></div>
+        </div>
+      </div>
+      <p class="card-description">O clássico jogo de damas com IA inteligente. Capture as peças do adversário e chegue à última linha para virar dama.</p>
+      <div class="card-tags">
+        <span class="tag tag-ia">IA</span>
+        <span class="tag tag-estrategia">Estratégia</span>
+        <span class="tag">2 Jogadores</span>
+      </div>
+    </div>
+
+    <!-- Ludo -->
+    <div class="game-card" data-file="ludo.html" data-available="true"
+         data-categories="multi,estrategia"
+         style="--card-accent:#4ecdc4;--card-accent-bg:rgba(78,205,196,.12);"
+         onclick="openGame('ludo.html','Ludo')">
+      <div class="card-header">
+        <div class="card-icon">🎲</div>
+        <div>
+          <div class="card-title">Ludo</div>
+          <div class="card-category">Tabuleiro Clássico</div>
+        </div>
+        <div class="difficulty">
+          <div class="diff-dot active"></div>
+          <div class="diff-dot"></div>
+          <div class="diff-dot"></div>
+        </div>
+      </div>
+      <p class="card-description">O popular Ludo para até 4 jogadores. Role o dado e leve suas peças até a base final. Evite ser capturado!</p>
+      <div class="card-tags">
+        <span class="tag tag-multi">Multi-jogador</span>
+        <span class="tag tag-estrategia">Sorte e Estratégia</span>
+        <span class="tag">2–4 Jogadores</span>
+      </div>
+    </div>
+
+    <!-- Reversi -->
+    <div class="game-card" data-file="reversi.html" data-available="true"
+         data-categories="estrategia,logica,ia"
+         style="--card-accent:#DA7756;--card-accent-bg:rgba(218,119,86,.12);"
+         onclick="openGame('reversi.html','Reversi')">
+      <div class="card-header">
+        <div class="card-icon">⬤</div>
+        <div>
+          <div class="card-title">Reversi</div>
+          <div class="card-category">Tabuleiro Estratégico</div>
+        </div>
+        <div class="difficulty">
+          <div class="diff-dot active"></div>
+          <div class="diff-dot active"></div>
+          <div class="diff-dot active"></div>
+        </div>
+      </div>
+      <p class="card-description">Othello/Reversi: inversão profunda de peças. Domine o tabuleiro posicionando peças que capturam as do oponente.</p>
+      <div class="card-tags">
+        <span class="tag tag-ia">IA</span>
+        <span class="tag tag-estrategia">Estratégia</span>
+        <span class="tag tag-logica">Lógica</span>
+      </div>
+    </div>
+
+    <!-- Connect Four -->
+    <div class="game-card" data-file="connect-four.html" data-available="true"
+         data-categories="estrategia,logica,ia"
+         style="--card-accent:#ffe66d;--card-accent-bg:rgba(255,230,109,.12);"
+         onclick="openGame('connect-four.html','Connect Four')">
+      <div class="card-header">
+        <div class="card-icon">🟡</div>
+        <div>
+          <div class="card-title">Connect Four</div>
+          <div class="card-category">Tabuleiro Estratégico</div>
+        </div>
+        <div class="difficulty">
+          <div class="diff-dot active"></div>
+          <div class="diff-dot active"></div>
+          <div class="diff-dot"></div>
+        </div>
+      </div>
+      <p class="card-description">Conecte quatro peças em linha, coluna ou diagonal. Desafie a IA e teste seu raciocínio espacial.</p>
+      <div class="card-tags">
+        <span class="tag tag-ia">IA</span>
+        <span class="tag tag-estrategia">Estratégia</span>
+        <span class="tag">Raciocínio Espacial</span>
+      </div>
+    </div>
+
+    <!-- Batalha Naval -->
+    <div class="game-card" data-file="batalha-naval.html" data-available="true"
+         data-categories="estrategia,logica,ia"
+         style="--card-accent:#06b6d4;--card-accent-bg:rgba(6,182,212,.12);"
+         onclick="openGame('batalha-naval.html','Batalha Naval')">
+      <div class="card-header">
+        <div class="card-icon">⛵</div>
+        <div>
+          <div class="card-title">Batalha Naval</div>
+          <div class="card-category">Tabuleiro Estratégico</div>
+        </div>
+        <div class="difficulty">
+          <div class="diff-dot active"></div>
+          <div class="diff-dot active"></div>
+          <div class="diff-dot"></div>
+        </div>
+      </div>
+      <p class="card-description">Posicione sua frota e afunde os navios inimigos. Raciocínio espacial e estratégia pura contra a IA.</p>
+      <div class="card-tags">
+        <span class="tag tag-ia">IA</span>
+        <span class="tag tag-estrategia">Estratégia</span>
+        <span class="tag tag-logica">Raciocínio Espacial</span>
+      </div>
+    </div>
+
+    <!-- Jogo da Velha+ -->
+    <div class="game-card" data-file="velha.html" data-available="true"
+         data-categories="logica,ia"
+         style="--card-accent:#a855f7;--card-accent-bg:rgba(168,85,247,.12);"
+         onclick="openGame('velha.html','Jogo da Velha+')">
+      <div class="card-header">
+        <div class="card-icon">✕</div>
+        <div>
+          <div class="card-title">Jogo da Velha+</div>
+          <div class="card-category">Tabuleiro Clássico</div>
+        </div>
+        <div class="difficulty">
+          <div class="diff-dot active"></div>
+          <div class="diff-dot active"></div>
+          <div class="diff-dot"></div>
+        </div>
+      </div>
+      <p class="card-description">Jogo da Velha em grade 5×5 com IA avançada. Três modos de jogo para desafiar seu raciocínio tático.</p>
+      <div class="card-tags">
+        <span class="tag tag-ia">IA</span>
+        <span class="tag tag-logica">Lógica</span>
+        <span class="tag">3 Modos</span>
+      </div>
+    </div>
+
+    <!-- Sudoku -->
+    <div class="game-card" data-file="sudoku.html" data-available="true"
+         data-categories="logica"
+         style="--card-accent:#f97316;--card-accent-bg:rgba(249,115,22,.12);"
+         onclick="openGame('sudoku.html','Sudoku')">
+      <div class="card-header">
+        <div class="card-icon">🔢</div>
+        <div>
+          <div class="card-title">Sudoku</div>
+          <div class="card-category">Quebra-Cabeça</div>
+        </div>
+        <div class="difficulty">
+          <div class="diff-dot active"></div>
+          <div class="diff-dot active"></div>
+          <div class="diff-dot active"></div>
+        </div>
+      </div>
+      <p class="card-description">O clássico puzzle numérico japonês. 4 níveis de dificuldade para exercitar concentração e lógica.</p>
+      <div class="card-tags">
+        <span class="tag tag-logica">Lógica</span>
+        <span class="tag">4 Níveis</span>
+        <span class="tag">Concentração</span>
+      </div>
+    </div>
+
+  </div><!-- /games-grid -->
+
+  <footer>
+    <p>Board Games Pack &mdash; Jogos Cognitivos &copy; 2026</p>
+  </footer>
+</div>
+
+<script>
+// ── INTEGRAÇÃO COM APTOS SYNC ──────────────────────────────
+// Fecha este hub e retorna ao iframe pai
+function closeHub(){
+  if(window.parent !== window){
+    window.parent.postMessage({type:'BRAINHUNTER_CLOSE'},'*');
+  }
+}
+
+// Abre um jogo individual — funciona em iframe E standalone
+function openGame(file, name){
+  const card = document.querySelector(`[data-file="${file}"]`);
+  if(card && card.dataset.available === 'false') return;
+
+  // Efeito ripple no card clicado
+  if(card){
+    const rect = card.getBoundingClientRect();
+    const ripple = document.createElement('div');
+    ripple.className = 'ripple';
+    const size = Math.max(rect.width, rect.height) * 2;
+    ripple.style.cssText = `width:${size}px;height:${size}px;left:${rect.width/2 - size/2}px;top:${rect.height/2 - size/2}px;`;
+    card.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove());
+  }
+
+  // Mostra loader
+  document.getElementById('loader-text').innerText = `Carregando ${name}...`;
+  document.getElementById('game-loader').classList.add('open');
+
+  // Em iframe dentro do Aptos Sync: pede ao pai para carregar o jogo num novo iframe
+  if(window.parent !== window){
+    window.parent.postMessage({type:'BOARD_LAUNCH', file, name}, '*');
+    // Se o pai não suportar BOARD_LAUNCH, fallback após 2s
+    setTimeout(() => {
+      document.getElementById('game-loader').classList.remove('open');
+    }, 2000);
+  } else {
+    // Standalone: navega direto
+    setTimeout(() => { window.location.href = file; }, 300);
+  }
+}
+
+// ── FILTRO POR CATEGORIA ─────────────────────────────────
+function filterCards(btn, filter){
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const cards = document.querySelectorAll('.game-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const cats = (card.dataset.categories || '').split(',');
+    const show = filter === 'todos' || cats.includes(filter);
+    card.style.display = show ? '' : 'none';
+    if(show) visible++;
+  });
+  document.getElementById('stat-available').innerText = visible;
+}
+
+// ── HOVER GLOW (sem getComputedStyle para compat. Safari) ─
+document.querySelectorAll('.game-card').forEach(card => {
+  const accent = card.style.getPropertyValue('--card-accent') || '#DA7756';
+  card.addEventListener('mouseenter', function(){
+    if(this.dataset.available === 'false') return;
+    this.style.boxShadow = `0 20px 60px rgba(0,0,0,.4), 0 0 40px ${accent}22`;
+  });
+  card.addEventListener('mouseleave', function(){
+    this.style.boxShadow = '';
+  });
+  // Touch feedback
+  card.addEventListener('touchstart', function(){
+    if(this.dataset.available === 'false') return;
+    this.style.transform = 'scale(.97)';
+  }, {passive:true});
+  card.addEventListener('touchend', function(){
+    this.style.transform = '';
+  });
+});
+
+// ── ESC para voltar ──────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') closeHub();
+});
+
+// ── CONTADOR inicial de jogos disponíveis ────────────────
+const available = document.querySelectorAll('.game-card[data-available="true"]').length;
+document.getElementById('stat-available').innerText = available;
+</script>
+</body>
+</html>

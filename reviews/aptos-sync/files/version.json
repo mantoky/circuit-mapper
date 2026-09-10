@@ -1,0 +1,9 @@
+{
+  "version": "1.6.2",
+  "date": "2026-09-10",
+  "changelog": [
+    "Padroes de acessibilidade: zoom, labels, contraste e reduced-motion",
+    "Hash de senha SHA-256 com migracao do algoritmo legado",
+    "PWA e Netlify: theme_color, icones e headers sem redirect SPA"
+  ]
+}
