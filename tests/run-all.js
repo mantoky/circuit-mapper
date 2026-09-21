@@ -5,7 +5,7 @@
 const { execFileSync } = require('child_process');
 const path = require('path');
 
-const suites = ['engine.test.js', 'flow.test.js', 'exports.test.js', 'safety.test.js', 'web.test.js'];
+const suites = ['engine.test.js', 'flow.test.js', 'exports.test.js', 'safety.test.js', 'constants.test.js', 'web.test.js'];
 let failed = 0;
 
 console.log('\n\x1b[43m\x1b[30m  CIRCUIT MAPPER — SUITE DE TESTES  \x1b[0m');

@@ -17,6 +17,7 @@ const ROOT = path.resolve(__dirname, '..');
 const MODULES = [
   'src/core/schema.js',
   'src/core/treeEngine.js',
+  'src/core/constants.js',
   'src/core/engineering.js',
   'src/core/validation.js',
   'src/core/loadTable.js',

@@ -5,8 +5,10 @@
  * O laudo final deve ser assinado por profissional habilitado (ART/CREA).
  */
 
-const RHO_CU = 1 / 56;   // 0,01786 ohm.mm2/m - cobre a 70 C
-const SQRT3 = Math.sqrt(3);
+const { getConstant } = require('./constants');
+
+const RHO_CU = getConstant('RHO_CU'); // 0,01786 ohm.mm2/m - cobre a 70 C
+const SQRT3 = getConstant('SQRT3');
 
 /** Serie comercial de disjuntores (A) */
 const BREAKER_SERIES = [6, 10, 16, 20, 25, 32, 40, 50, 63, 70, 80, 100, 125, 160, 200, 250, 320, 400, 500, 630, 800];
