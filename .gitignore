@@ -15,6 +15,7 @@ ios/
 dist/
 # Bundle Flash Report standalone (rode `npm run build:flash`)
 dist-flash/
+export/
 
 # Saidas de testes/amostras (regeneradas)
 tests/output/
