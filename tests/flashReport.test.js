@@ -1,9 +1,8 @@
 /**
- * Testes do nucleo Flash Report (TI / LTE).
+ * Testes do nucleo Flash Report (TI / LTE) — app standalone.
  */
 const { eq, ok, section, report } = require('./_harness');
 const FR = require('../src/core/flashReport');
-const { reducer, initialState } = require('../src/store/projectReducer');
 
 section('modelo e catalogos');
 ok(FR.KINDS.length >= 4, 'tipos de flash');
@@ -40,17 +39,6 @@ eq(FR.joinList(['Serra Leste', 'Serra Norte', 'Serra Sul']),
 const emptyIssues = FR.validateFlashReport(FR.emptyFlashReport());
 ok(emptyIssues.some((i) => i.code === 'FR01'), 'titulo obrigatorio');
 eq(FR.validateFlashReport(demo).filter((i) => i.level === 'error').length, 0, 'demo sem erros');
-
-section('reducer SET_FLASH / RESET_FLASH');
-let state = reducer(initialState, { type: 'HYDRATE', payload: { tree: [], header: {}, expanded: {} } });
-ok(state.flashReport && state.flashReport.kind, 'flash hidratado');
-state = reducer(state, { type: 'SET_FLASH', patch: { title: 'LINK LTE CAIDO', environment: 'LTE' } });
-eq(state.flashReport.title, 'LINK LTE CAIDO', 'set flash title');
-eq(state.flashReport.environment, 'LTE', 'set flash env');
-state = reducer(state, { type: 'RESET_FLASH', demo: true });
-eq(state.flashReport.contractor, 'Xerox', 'reset demo xerox');
-state = reducer(state, { type: 'LOAD_DEMO' });
-eq(state.flashReport.title, 'FALHA NO SERVIDOR DE IMPRESSAO', 'load demo inclui flash');
 
 section('assunto');
 ok(FR.formatSubject(demo).includes('INFORMATIVO'), 'subject tipo');

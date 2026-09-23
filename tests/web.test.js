@@ -83,7 +83,7 @@ H.ok(!!API, '1.1 aplicacao inicializou e exportou API interna');
 H.ok(!!API.modules.T && !!API.modules.VAL, '1.2 modulos do core resolvidos pelo shim CommonJS');
 H.eq(typeof API.modules.T.flatten, 'function', '1.3 treeEngine funcional no navegador');
 H.eq($('#splash').className, 'hidden', '1.4 splash removido apos boot');
-H.eq($$('.tab').length, 5, '1.5 cinco abas de navegacao renderizadas');
+H.eq($$('.tab').length, 4, '1.5 quatro abas de navegacao renderizadas');
 H.ok($('#scrTitle').textContent.includes('CIRCUIT MAPPER'), '1.6 titulo inicial correto');
 H.ok(byText('.btn', 'Iniciar cadastro'), '1.7 estado vazio oferece iniciar cadastro');
 

@@ -18,8 +18,6 @@ var WBSPEC = __require('src/export/workbookSpec');
 var XLSX   = __require('src/export/xlsxWriter');
 var FN     = __require('src/export/fileName');
 var IMPVAL = __require('src/core/importValidate');
-var FR     = __require('src/core/flashReport');
-
 var COLORS = {
   ok: '#34D399', warn: '#FBBF24', err: '#F87171', pri: '#22D3EE', dim: '#6B829E',
   phaseR: '#F87171', phaseS: '#E6EDF3', phaseT: '#60A5FA', neutral: '#38BDF8', ground: '#34D399',
@@ -40,7 +38,7 @@ var STATUS_LABEL = { ok:'CONFORME', warn:'RESSALVA', error:'NAO CONF.' };
 var KEY = '@vcm/web';
 var MAX_HISTORY = 40;
 var S = {
-  tab: 'projeto', tree: [], header: null, flashReport: null, expanded: {},
+  tab: 'projeto', tree: [], header: null, expanded: {},
   past: [], future: [], filter: '', editId: null, addFor: undefined,
   sections: ['cover','intro','tree','tables','assets','findings','conclusion'],
   log: [],
@@ -59,11 +57,7 @@ var EMPTY_HEADER = {
 };
 
 function save(){
-  try{
-    localStorage.setItem(KEY, JSON.stringify({
-      tree:S.tree, header:S.header, expanded:S.expanded, flashReport:S.flashReport,
-    }));
-  }
+  try{ localStorage.setItem(KEY, JSON.stringify({tree:S.tree, header:S.header, expanded:S.expanded})); }
   catch(e){ toast('Falha ao salvar localmente: '+e.message, true); }
 }
 function load(){
@@ -71,10 +65,7 @@ function load(){
     var raw = localStorage.getItem(KEY);
     if(!raw) return false;
     var d = JSON.parse(raw);
-    S.tree = d.tree||[];
-    S.header = d.header||clone(EMPTY_HEADER);
-    S.expanded = d.expanded||{};
-    S.flashReport = d.flashReport || FR.emptyFlashReport();
+    S.tree = d.tree||[]; S.header = d.header||clone(EMPTY_HEADER); S.expanded = d.expanded||{};
     return true;
   }catch(e){ return false; }
 }
@@ -269,13 +260,11 @@ function screenProjeto(){
 
   root.appendChild(section('Acoes'));
   root.appendChild(button('Modo Construcao','lg','ARV',function(){ go('construcao'); }));
-  root.appendChild(button('Flash Report TI / LTE','ghost lg mt','FR',function(){ go('flash'); }));
   root.appendChild(button('Modo Laudo / Relatorios','ghost lg mt','DOC',function(){ go('laudo'); }));
   root.appendChild(button('Importar projeto (.json)','dark mt','IMP',importJson));
   root.appendChild(button('Limpar projeto','danger mt','DEL',function(){
     if(confirm('Todos os dados locais serao apagados. Confirmar?')){
-      S.tree=[]; S.header=clone(EMPTY_HEADER); S.flashReport=FR.emptyFlashReport();
-      S.expanded={}; S.past=[]; S.future=[];
+      S.tree=[]; S.header=clone(EMPTY_HEADER); S.expanded={}; S.past=[]; S.future=[];
       save(); render(); toast('Projeto limpo.');
     }
   }));
@@ -285,7 +274,6 @@ function screenProjeto(){
 function loadDemo(){
   mutate(function(){ return SEED.attachSampleAssets(SEED.buildSeedTree()); });
   S.header = Object.assign(clone(EMPTY_HEADER), SEED.seedReportHeader);
-  S.flashReport = FR.demoFlashReport();
   var exp = {};
   (function walk(l){ l.forEach(function(n){ exp[n.id]=true; walk(n.children); }); })(S.tree);
   S.expanded = exp;
@@ -1142,415 +1130,12 @@ function importJson(){
 }
 
 /* =========================================================================
-   TELA: FLASH REPORT (TI / LTE)
-   ========================================================================= */
-function flashAccent(status){
-  if(status==='normalizado') return COLORS.ok;
-  if(status==='encerrado') return COLORS.dim;
-  if(status==='identificado') return COLORS.info;
-  if(status==='em_analise') return '#A78BFA';
-  if(status==='monitorando') return COLORS.warn;
-  return COLORS.warn;
-}
-
-function flashLogoPicker(label, key){
-  var fr = S.flashReport;
-  var w = el('div','logo');
-  w.appendChild(el('div','h3',label)).style.cssText=
-    'font:700 13px Roboto;letter-spacing:1.1px;color:#22D3EE;text-transform:uppercase;'
-    +'border:0;padding:0;margin:0 0 6px';
-  var box = el('button','box');
-  function draw(){
-    clear(box);
-    if(fr[key]){
-      var img = el('img'); img.src = fr[key]; box.appendChild(img);
-    } else box.appendChild(el('span',null,'TOQUE PARA\nSELECIONAR IMAGEM'));
-  }
-  draw();
-  var inp = el('input'); inp.type='file'; inp.accept='image/*'; inp.style.display='none';
-  on(inp,'change',function(){
-    var f = inp.files && inp.files[0]; if(!f) return;
-    var rd = new FileReader();
-    rd.onload = function(){ fr[key] = rd.result; save(); draw(); toast('Logo carregado.'); };
-    rd.onerror = function(){ toast('Falha ao ler a imagem.',true); };
-    rd.readAsDataURL(f);
-  });
-  on(box,'click',function(){ inp.click(); });
-  w.appendChild(box); w.appendChild(inp);
-  var act = el('div'); act.style.cssText='display:flex;justify-content:space-between;margin-top:5px';
-  if(fr[key]){
-    var rm = el('button',null,'REMOVER');
-    rm.style.cssText='font:700 10px Roboto;letter-spacing:.9px;color:#F87171';
-    on(rm,'click',function(){ fr[key]=null; save(); render(); });
-    act.appendChild(rm);
-  }
-  w.appendChild(act);
-  return w;
-}
-
-function buildFlashCardDom(r){
-  var kind = FR.kindInfo(r.kind);
-  var st = FR.statusInfo(r.status);
-  var sev = FR.severityInfo(r.severity);
-  var env = FR.environmentInfo(r.environment);
-  var accent = flashAccent(r.status);
-  var card = el('div','fr-card');
-  var stripe = el('div','fr-stripe'); stripe.style.background = accent; card.appendChild(stripe);
-
-  var logos = el('div','fr-logos');
-  function logoSlot(uri, caption, side){
-    var s = el('div','fr-logo-slot '+side);
-    if(uri){ var img = el('img','fr-logo'); img.src = uri; s.appendChild(img); }
-    else { var ph = el('div','fr-logo-ph','LOGO'); s.appendChild(ph); }
-    s.appendChild(el('div','fr-logo-cap', caption || (side==='left'?'Contratada':'Contratante')));
-    return s;
-  }
-  logos.appendChild(logoSlot(r.contractorLogo, r.contractor, 'left'));
-  var mid = el('div','fr-logo-mid');
-  mid.appendChild(el('div','fr-kicker', kind.emoji+' FLASH REPORT'));
-  mid.appendChild(el('div','fr-kind', kind.id+' · '+env.label));
-  logos.appendChild(mid);
-  logos.appendChild(logoSlot(r.clientLogo, r.client, 'right'));
-  card.appendChild(logos);
-
-  card.appendChild(el('div','fr-area', r.area || 'OPERACAO'));
-  if(Number(r.updateNumber) > 1){
-    card.appendChild(el('div','fr-upd', 'ATUALIZACAO #'+r.updateNumber));
-  }
-  card.appendChild(el('div','fr-title', String(r.title||'SEM TITULO').toUpperCase()));
-  if(r.description) card.appendChild(el('div','fr-desc', r.description));
-
-  var badges = el('div','fr-badges');
-  function badge(txt, color){
-    var b = el('span','fr-badge', txt);
-    b.style.borderColor = color; b.style.color = color; b.style.background = color+'22';
-    badges.appendChild(b);
-  }
-  badge(st.emoji+' '+st.label, accent);
-  badge(sev.emoji+' '+sev.label, COLORS.warn);
-  if(r.ticket) badge(r.ticket, COLORS.info);
-  card.appendChild(badges);
-
-  function row(label, value, hi){
-    if(!value) return;
-    var rw = el('div','fr-row'+(hi?' hi':''));
-    rw.appendChild(el('div','fr-row-lb', label));
-    rw.appendChild(el('div','fr-row-v', value));
-    card.appendChild(rw);
-  }
-  row('Locais afetados', FR.joinList(r.locations));
-  row('Servicos impactados', FR.joinList(r.services));
-  row('Impacto', r.impact);
-  row('Motivo', r.reason);
-  row('Situacao atual', r.situation, true);
-  row('Contorno', r.workaround);
-
-  var tl = el('div','fr-timeline');
-  function tcell(k,v){
-    if(!v) return;
-    var c = el('div','fr-tcell');
-    c.appendChild(el('div','fr-tk', k));
-    c.appendChild(el('div','fr-tv', v));
-    tl.appendChild(c);
-  }
-  tcell('Inicio', r.startedAt);
-  tcell('Atualizado', r.updatedAt);
-  tcell('Previsao', r.eta);
-  if(tl.childNodes.length) card.appendChild(tl);
-
-  var parties = el('div','fr-parties');
-  if(r.client) parties.appendChild(el('div',null,'Contratante: '+r.client));
-  if(r.contractor) parties.appendChild(el('div',null,'Contratada: '+r.contractor));
-  var teams = FR.joinList(r.teams);
-  if(teams) parties.appendChild(el('div',null,'Times: '+teams));
-  if(r.responsible) parties.appendChild(el('div',null,'Responsavel: '+r.responsible));
-  if(r.contact) parties.appendChild(el('div',null,'Contato: '+r.contact));
-  if(parties.childNodes.length) card.appendChild(parties);
-  if(r.notes) card.appendChild(el('div','fr-notes','Obs.: '+r.notes));
-
-  var stripe2 = el('div','fr-stripe'); stripe2.style.background = accent; card.appendChild(stripe2);
-  return card;
-}
-
-function screenFlash(){
-  if(!S.flashReport) S.flashReport = FR.emptyFlashReport();
-  var r = S.flashReport;
-  var root = el('div','pad');
-
-  function patch(k){
-    return function(v){ r[k]=v; save(); };
-  }
-  function patchList(k){
-    return function(v){ r[k]=FR.parseList(v); save(); };
-  }
-  function pickRequired(key, mapLabel){
-    return function(v){
-      if(!v) return;
-      r[key] = mapLabel ? mapLabel(v) : v;
-      save(); render();
-    };
-  }
-
-  var top = el('div','row');
-  top.appendChild(button('Caso demo','ghost','DEMO',function(){
-    S.flashReport = FR.demoFlashReport(); save(); render(); toast('Caso de impressao carregado.');
-  }));
-  top.appendChild(button('Novo','dark','+',function(){
-    S.flashReport = FR.emptyFlashReport({
-      client: (S.header&&S.header.client)||'',
-      contractor: (S.header&&S.header.contractor)||'',
-      clientLogo: (S.header&&S.header.clientLogo)||null,
-      contractorLogo: (S.header&&S.header.contractorLogo)||null,
-    });
-    save(); render();
-  }));
-  root.appendChild(top);
-
-  root.appendChild(section('Classificacao'));
-  root.appendChild(select('Tipo', r.kind, FR.KINDS.map(function(k){return k.id;}),
-    pickRequired('kind'), null));
-  root.appendChild(select('Ambiente', r.environment, FR.ENVIRONMENTS.map(function(e){return e.id;}),
-    pickRequired('environment'), null));
-  root.appendChild(select('Severidade',
-    (FR.severityInfo(r.severity)||{}).label || 'Alta',
-    FR.SEVERITIES.map(function(s){return s.label;}),
-    pickRequired('severity', function(lab){
-      var hit = FR.SEVERITIES.find(function(s){ return s.label===lab; });
-      return hit ? hit.id : 'alta';
-    }), null));
-  root.appendChild(select('Status',
-    (FR.statusInfo(r.status)||{}).label || 'Em atendimento',
-    FR.STATUSES.map(function(s){return s.label;}),
-    pickRequired('status', function(lab){
-      var hit = FR.STATUSES.find(function(s){ return s.label===lab; });
-      return hit ? hit.id : 'em_atendimento';
-    }), null));
-
-  root.appendChild(section('Identificacao'));
-  root.appendChild(field('Area / Gerencia', r.area, patch('area'),
-    {placeholder:'GER TECN ATEND PA'}));
-  root.appendChild(field('Titulo da falha', r.title, patch('title'),
-    {placeholder:'FALHA NO SERVIDOR DE IMPRESSAO'}));
-  root.appendChild(field('Descricao', r.description, patch('description'),
-    {multiline:true, placeholder:'Indisponibilidade do servico...'}));
-  var idRow = el('div','row');
-  idRow.appendChild(field('Chamado / Ticket', r.ticket, patch('ticket'),
-    {placeholder:'INC-2026-0412'}));
-  idRow.appendChild(field('Atualizacao #', String(r.updateNumber||1), function(v){
-    r.updateNumber = Number(v)||1; save();
-  }, {kind:'number'}));
-  root.appendChild(idRow);
-
-  root.appendChild(section('Escopo do impacto'));
-  root.appendChild(field('Locais afetados', (r.locations||[]).join(', '), patchList('locations'),
-    {multiline:true, placeholder:'Serra Leste, Serra Norte, Serra Sul'}));
-  root.appendChild(field('Servicos impactados', (r.services||[]).join(', '), patchList('services'),
-    {multiline:true, placeholder:'Impressao, Digitalizacao'}));
-  root.appendChild(field('Impacto operacional', r.impact, patch('impact'), {multiline:true}));
-  root.appendChild(field('Motivo', r.reason, patch('reason'), {multiline:true}));
-  root.appendChild(field('Situacao atual', r.situation, patch('situation'), {multiline:true}));
-  root.appendChild(field('Contorno / Workaround', r.workaround, patch('workaround'), {multiline:true}));
-
-  root.appendChild(section('Linha do tempo'));
-  var tRow = el('div','row');
-  tRow.appendChild(field('Inicio', r.startedAt, patch('startedAt'), {placeholder:'AAAA-MM-DD HH:MM'}));
-  tRow.appendChild(field('Atualizado', r.updatedAt, patch('updatedAt'), {placeholder:'AAAA-MM-DD HH:MM'}));
-  root.appendChild(tRow);
-  root.appendChild(field('Previsao (ETA)', r.eta, patch('eta'), {placeholder:'AAAA-MM-DD HH:MM'}));
-
-  root.appendChild(section('Empresas e responsaveis'));
-  root.appendChild(field('Contratante', r.client, patch('client'), {placeholder:'Vale S.A.'}));
-  root.appendChild(field('Contratada', r.contractor, patch('contractor'), {placeholder:'Xerox'}));
-  root.appendChild(field('Times envolvidos', (r.teams||[]).join(', '), patchList('teams'),
-    {placeholder:'Xerox, TI Vale'}));
-  root.appendChild(field('Responsavel', r.responsible, patch('responsible'), {placeholder:'Time Xerox'}));
-  root.appendChild(field('Contato / Plantao', r.contact, patch('contact')));
-  root.appendChild(field('Observacoes', r.notes, patch('notes'), {multiline:true}));
-
-  root.appendChild(section('Logotipos'));
-  root.appendChild(el('p','hint',
-    'Contratada a esquerda, contratante a direita — embutidos no card de imagem.'));
-  var lr = el('div','row');
-  lr.appendChild(flashLogoPicker('Logo da Contratada','contractorLogo'));
-  lr.appendChild(flashLogoPicker('Logo da Contratante','clientLogo'));
-  root.appendChild(lr);
-  root.appendChild(button('Usar logos do cabecalho do laudo','ghost mt','LOGO',function(){
-    r.client = r.client || (S.header&&S.header.client) || '';
-    r.contractor = r.contractor || (S.header&&S.header.contractor) || '';
-    r.clientLogo = (S.header&&S.header.clientLogo) || r.clientLogo;
-    r.contractorLogo = (S.header&&S.header.contractorLogo) || r.contractorLogo;
-    save(); render(); toast('Logos sincronizados.');
-  }));
-
-  root.appendChild(section('Atalhos'));
-  var shortcuts = el('div','row');
-  shortcuts.appendChild(button('Nova atualizacao','dark','#',function(){
-    r.updateNumber = Number(r.updateNumber||1)+1;
-    r.kind = 'ATUALIZACAO';
-    r.updatedAt = FR.nowLocalStamp();
-    save(); render();
-  }));
-  shortcuts.appendChild(button('Normalizado','ok','OK',function(){
-    r.status = 'normalizado';
-    r.kind = 'NORMALIZACAO';
-    r.updatedAt = FR.nowLocalStamp();
-    if(!r.situation) r.situation = 'Servico restabelecido. Monitoramento ativo.';
-    save(); render();
-  }));
-  root.appendChild(shortcuts);
-
-  root.appendChild(section('Preview do card'));
-  var wrap = el('div','fr-preview-wrap');
-  wrap.appendChild(buildFlashCardDom(r));
-  root.appendChild(wrap);
-
-  root.appendChild(section('Texto WhatsApp / Teams'));
-  var msg = FR.formatWhatsApp(r);
-  var box = el('pre','fr-msg'); box.textContent = msg;
-  root.appendChild(box);
-
-  root.appendChild(button('Copiar texto','lg mt','TXT',function(){
-    var issues = FR.validateFlashReport(r).filter(function(i){ return i.level==='error'; });
-    if(issues.length){ toast(issues[0].message, true); return; }
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(msg).then(function(){ toast('Texto copiado.'); })
-        .catch(function(){ toast('Nao foi possivel copiar.', true); });
-    } else {
-      var ta = el('textarea'); ta.value = msg; document.body.appendChild(ta);
-      ta.select();
-      try{ document.execCommand('copy'); toast('Texto copiado.'); }
-      catch(e){ toast('Nao foi possivel copiar.', true); }
-      document.body.removeChild(ta);
-    }
-  }));
-
-  root.appendChild(button('Baixar card PNG','ghost lg mt','IMG',function(){
-    var issues = FR.validateFlashReport(r).filter(function(i){ return i.level==='error'; });
-    if(issues.length){ toast(issues[0].message, true); return; }
-    downloadFlashPng(r);
-  }));
-
-  return root;
-}
-
-function downloadFlashPng(r){
-  var canvas = document.createElement('canvas');
-  canvas.width = 1080; canvas.height = 1400;
-  var ctx = canvas.getContext('2d');
-  var accent = flashAccent(r.status);
-  var kind = FR.kindInfo(r.kind);
-  var st = FR.statusInfo(r.status);
-  var sev = FR.severityInfo(r.severity);
-  var env = FR.environmentInfo(r.environment);
-
-  function fill(c,x,y,w,h){ ctx.fillStyle=c; ctx.fillRect(x,y,w,h); }
-  function text(str,x,y,size,color,align,bold){
-    ctx.fillStyle = color||'#E6EDF3';
-    ctx.font = (bold?'700 ':'500 ')+size+'px Roboto, Arial, sans-serif';
-    ctx.textAlign = align||'left';
-    ctx.fillText(String(str||''), x, y);
-  }
-
-  fill('#0E1A2B',0,0,1080,1400);
-  fill(accent,36,36,1008,12);
-
-  text(kind.emoji+' FLASH REPORT', 540, 110, 28, '#22D3EE', 'center', true);
-  text(kind.id+' · '+env.label, 540, 150, 22, '#9FB3C8', 'center', true);
-  text(r.area||'OPERACAO', 540, 185, 18, '#6B829E', 'center', true);
-  text(String(r.title||'SEM TITULO').toUpperCase(), 540, 250, 36, '#E6EDF3', 'center', true);
-
-  var y = 300;
-  function wrapText(str, maxW, size, color){
-    if(!str) return;
-    ctx.font = '500 '+size+'px Roboto, Arial, sans-serif';
-    var words = String(str).split(/\s+/), line='', lines=[];
-    words.forEach(function(w){
-      var test = line ? line+' '+w : w;
-      if(ctx.measureText(test).width > maxW){ lines.push(line); line=w; }
-      else line = test;
-    });
-    if(line) lines.push(line);
-    lines.forEach(function(ln){ text(ln, 540, y, size, color, 'center'); y += size+8; });
-    y += 8;
-  }
-  wrapText(r.description, 920, 22, '#9FB3C8');
-
-  y += 10;
-  text(st.emoji+' '+st.label+'   ·   '+sev.emoji+' '+sev.label+(r.ticket?'   ·   '+r.ticket:''),
-    540, y, 22, accent, 'center', true);
-  y += 40;
-
-  function block(label, value){
-    if(!value) return;
-    fill('#16263D', 48, y, 984, 10);
-    y += 28;
-    text(label.toUpperCase(), 70, y, 16, '#22D3EE', 'left', true); y += 28;
-    ctx.font = '500 20px Roboto, Arial, sans-serif';
-    var words = String(value).split(/\s+/), line='';
-    words.forEach(function(w){
-      var test = line ? line+' '+w : w;
-      if(ctx.measureText(test).width > 900){
-        text(line, 70, y, 20, '#9FB3C8', 'left'); y += 28; line = w;
-      } else line = test;
-    });
-    if(line){ text(line, 70, y, 20, '#9FB3C8', 'left'); y += 28; }
-    y += 12;
-  }
-  block('Locais afetados', FR.joinList(r.locations));
-  block('Servicos impactados', FR.joinList(r.services));
-  block('Motivo', r.reason);
-  block('Situacao atual', r.situation);
-  block('Contorno', r.workaround);
-
-  y += 10;
-  var parties = [];
-  if(r.client) parties.push('Contratante: '+r.client);
-  if(r.contractor) parties.push('Contratada: '+r.contractor);
-  if(r.responsible) parties.push('Responsavel: '+r.responsible);
-  parties.forEach(function(p){ text(p, 70, y, 18, '#6B829E', 'left'); y += 26; });
-
-  fill(accent, 36, 1370, 1008, 12);
-
-  var pending = 0;
-  function done(){
-    pending--;
-    if(pending>0) return;
-    canvas.toBlob(function(blob){
-      if(!blob){ toast('Falha ao gerar PNG.', true); return; }
-      var a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'flash-report-'+(r.ticket||r.id||'fr')+'.png';
-      a.click();
-      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1500);
-      toast('Card PNG baixado.');
-    }, 'image/png');
-  }
-  function drawLogo(uri, x){
-    if(!uri) return;
-    pending++;
-    var img = new Image();
-    img.onload = function(){
-      var h = 64, w = Math.min(200, img.width*(h/img.height));
-      ctx.drawImage(img, x, 70, w, h);
-      done();
-    };
-    img.onerror = function(){ done(); };
-    img.src = uri;
-  }
-  pending = 1;
-  drawLogo(r.contractorLogo, 48);
-  drawLogo(r.clientLogo, 830);
-  done();
-}
-
-/* =========================================================================
    SHELL
    ========================================================================= */
 var TITLES = {
   projeto:['CIRCUIT MAPPER','Mapeamento e Cadastro de Circuitos Eletricos'],
   construcao:['MODO CONSTRUCAO',''],
   conformidade:['CONFORMIDADE','Checklist automatico ABNT NBR 5410'],
-  flash:['FLASH REPORT','Falhas TI / LTE · logos contratada e contratante'],
   laudo:['LAUDO','PDF · Word · Excel · Imagem · Backup'],
 };
 function go(tab){ S.tab = tab; if(tab==='laudo') laudoStep='header'; render(); }
@@ -1579,18 +1164,13 @@ function render(){
     S.tab==='projeto' ? screenProjeto()
     : S.tab==='construcao' ? screenConstrucao()
     : S.tab==='conformidade' ? screenConformidade()
-    : S.tab==='flash' ? screenFlash()
     : screenLaudo()
   );
   syncUndoButtons();
 }
 
 function boot(){
-  if(!load()){
-    S.header = clone(EMPTY_HEADER);
-    S.flashReport = FR.emptyFlashReport();
-  }
-  if(!S.flashReport) S.flashReport = FR.emptyFlashReport();
+  if(!load()) S.header = clone(EMPTY_HEADER);
   Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(b){
     on(b,'click',function(){ go(b.getAttribute('data-tab')); });
   });
@@ -1612,7 +1192,7 @@ window.__VCM = {
   mutate: mutate, undo: undo, redo: redo, validation: validation,
   setAllExpanded: setAllExpanded, renderSummaryCanvas: renderSummaryCanvas,
   modules: { T:T, SCH:SCH, ENG:ENG, VAL:VAL, LT:LT, SEED:SEED, LAUDO:LAUDO,
-             WBSPEC:WBSPEC, XLSX:XLSX, FN:FN, FR:FR },
+             WBSPEC:WBSPEC, XLSX:XLSX, FN:FN },
 };
 
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);

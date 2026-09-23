@@ -225,39 +225,3 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   background:var(--pri);color:var(--onPri);border-radius:var(--r);padding:14px 16px;
   font:700 14px Roboto;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.5);animation:up .2s ease}
 #toast.err{background:var(--err);color:#fff}
-
-/* ---------- Flash Report ---------- */
-.fr-preview-wrap{overflow-x:auto;padding:8px 0 16px;-webkit-overflow-scrolling:touch}
-.fr-card{min-width:320px;max-width:560px;background:var(--bg);border:2px solid var(--bd2);
-  border-radius:12px;padding:18px;margin:0 auto}
-.fr-stripe{height:8px;border-radius:3px;margin-bottom:14px}
-.fr-logos{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
-.fr-logo-slot{width:88px;flex:none}
-.fr-logo-slot.right{text-align:right}
-.fr-logo{max-width:88px;max-height:40px;object-fit:contain}
-.fr-logo-ph{height:40px;border:1.5px dashed var(--bd2);border-radius:6px;display:flex;
-  align-items:center;justify-content:center;font:700 10px Roboto;color:var(--dim);background:var(--surf)}
-.fr-logo-cap{font:500 10px Roboto;color:var(--dim);margin-top:4px;white-space:nowrap;
-  overflow:hidden;text-overflow:ellipsis}
-.fr-logo-mid{flex:1;text-align:center;min-width:0}
-.fr-kicker{font:800 13px Roboto;letter-spacing:1.5px;color:var(--pri)}
-.fr-kind{font:700 12px Roboto;color:var(--muted);margin-top:4px}
-.fr-area{font:700 11px Roboto;letter-spacing:1px;color:var(--dim);text-align:center;margin-top:4px}
-.fr-upd{font:700 11px Roboto;color:var(--warn);text-align:center;margin-top:4px}
-.fr-title{font:900 20px/1.25 "Aptos Narrow",Roboto,sans-serif;text-align:center;margin:12px 0 8px}
-.fr-desc{font:500 14px/1.45 Roboto;color:var(--muted);text-align:center;margin-bottom:10px}
-.fr-badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 12px}
-.fr-badge{border:1.5px solid;border-radius:8px;padding:6px 10px;font:700 12px Roboto}
-.fr-row{background:var(--surf);border-radius:8px;padding:12px;margin-bottom:8px;
-  border-left:4px solid var(--pri)}
-.fr-row.hi{border-left-color:var(--warn);background:rgba(251,191,36,.12)}
-.fr-row-lb{font:700 11px Roboto;letter-spacing:1px;color:var(--pri);text-transform:uppercase;margin-bottom:4px}
-.fr-row-v{font:500 14px/1.4 Roboto;color:var(--muted)}
-.fr-timeline{display:flex;gap:8px;margin-top:8px}
-.fr-tcell{flex:1;background:var(--surf2);border-radius:8px;padding:10px;min-width:0}
-.fr-tk{font:700 10px Roboto;letter-spacing:.8px;color:var(--dim);text-transform:uppercase}
-.fr-tv{font:700 13px Roboto;margin-top:4px;word-break:break-word}
-.fr-parties{margin-top:12px;font:500 12.5px/1.5 Roboto;color:var(--dim)}
-.fr-notes{font:italic 500 13px/1.45 Roboto;color:var(--dim);margin-top:10px}
-.fr-msg{white-space:pre-wrap;background:var(--surf);border:1.5px solid var(--bd);border-radius:var(--r);
-  padding:14px;font:500 13.5px/1.5 Roboto;color:var(--txt);overflow-x:auto}

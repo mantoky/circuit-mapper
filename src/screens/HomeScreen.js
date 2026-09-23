@@ -95,8 +95,6 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.section}>Acoes</Text>
             <VButton label="Modo Construcao" icon="ARV" size="lg"
               onPress={() => navigation.navigate('Construcao')} />
-            <VButton label="Flash Report TI / LTE" icon="FR" variant="ghost" size="lg"
-              onPress={() => navigation.navigate('Flash')} style={{ marginTop: 10 }} />
             <VButton label="Modo Laudo / Relatorios" icon="DOC" variant="ghost" size="lg"
               onPress={() => navigation.navigate('Laudo')} style={{ marginTop: 10 }} />
             <VButton label="Importar projeto (.json)" variant="dark" icon="IMP"

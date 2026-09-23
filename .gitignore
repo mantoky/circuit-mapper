@@ -13,6 +13,8 @@ ios/
 
 # Bundle web gerado (rode `npm run build:web`)
 dist/
+# Bundle Flash Report standalone (rode `npm run build:flash`)
+dist-flash/
 
 # Saidas de testes/amostras (regeneradas)
 tests/output/

@@ -48,12 +48,10 @@ a um app instalado.
    Esse encadeamento é o motor NBR trabalhando, não roteiro pré-gravado.
 5. Toque em ↶ (desfazer) algumas vezes e veja os valores voltarem.
 6. Use o **"+"** de qualquer linha para criar item filho — só aparecem os tipos permitidos pelo schema.
-7. Aba **Flash** → *Caso demo* (falha no servidor de impressão Vale/Xerox). Confira o texto
-   WhatsApp, envie logos da contratada/contratante e use *Copiar texto* ou *Baixar card PNG*.
-8. Aba **Conformidade** → filtre por não conformidades, toque em *Abrir item* em qualquer card.
-9. Aba **Laudo** → suba os dois logos pela galeria do telefone, então *Ir para geração*.
-10. Gere **PDF** (abre o diálogo de impressão → *Salvar como PDF*), **Excel**, **Word**, **Imagem** e **Backup**.
-11. Feche o navegador e reabra: o projeto continua lá (`localStorage`).
+7. Aba **Conformidade** → filtre por não conformidades, toque em *Abrir item* em qualquer card.
+8. Aba **Laudo** → suba os dois logos pela galeria do telefone, então *Ir para geração*.
+9. Gere **PDF** (abre o diálogo de impressão → *Salvar como PDF*), **Excel**, **Word**, **Imagem** e **Backup**.
+10. Feche o navegador e reabra: o projeto continua lá (`localStorage`).
 
 ### Limitações honestas desta versão
 
@@ -243,3 +241,18 @@ npm run samples       # regera os documentos de exemplo em tests/output/
 O bundler (`tools/bundleWeb.js`) inlina os módulos de `src/core` e `src/export` com um shim
 CommonJS de 30 linhas que resolve caminhos relativos. Não há etapa de transpilação: se você
 alterar `src/core/validation.js`, tanto o app Expo quanto o app web passam a usar a nova regra.
+
+
+---
+
+## Flash Report TI/LTE (app separado)
+
+Build e deploy **independentes** do Circuit Mapper:
+
+```bash
+npm run build:flash          # gera dist-flash/FLASH-REPORT.html
+VPS_PASS='...' bash tools/setupFlashVps.sh   # primeira vez (nginx + HTTPS + publish)
+npm run deploy:flash         # deploys seguintes
+```
+
+URL: **https://falha-ti-lte.techartsolucoes.com.br/**
