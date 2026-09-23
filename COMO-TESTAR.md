@@ -256,3 +256,20 @@ npm run deploy:flash         # deploys seguintes
 ```
 
 URL: **https://falha-ti-lte.techartsolucoes.com.br/**
+
+### Build no Windows (pasta local)
+
+Duplo clique em **`scripts/BUILD-FLASH.bat`** ou:
+
+```powershell
+npm run build:flash:win
+```
+
+Saída padrão: **`D:\Desenvolvedor\APPs\Flash report ti-lte`**  
+(abra `FLASH-REPORT.html` no Chrome/Edge)
+
+Outro destino:
+
+```powershell
+powershell -File scripts/build-flash-local.ps1 -OutDir "D:\caminho\customizado"
+```

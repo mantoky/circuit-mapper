@@ -12,6 +12,8 @@
     "test": "node tests/build-and-test.js",
     "build:web": "node tools/bundleWeb.js",
     "build:flash": "node tools/bundleFlashReport.js",
+    "export:flash": "node tools/exportFlashBuild.js",
+    "build:flash:win": "powershell -ExecutionPolicy Bypass -File scripts/build-flash-local.ps1",
     "deploy:vps": "bash tools/deployVps.sh",
     "deploy:flash": "bash tools/deployFlashVps.sh",
     "deploy:vps:win": "powershell -ExecutionPolicy Bypass -File tools/deployVps.ps1",
