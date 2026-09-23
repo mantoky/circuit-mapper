@@ -25,6 +25,7 @@ Autor: **Robson do Carmo — Engenharia Elétrica**
 | Checklist automático de conformidade (10 códigos NC) | `src/core/validation.js` |
 | **Quadro de cargas** padrão de unifilar industrial | `src/core/loadTable.js` (20 colunas técnicas) |
 | Cabeçalho de laudo + **upload de 2 logos** | `ReportSetupScreen.js` + `LogoPicker.js` |
+| **Flash Report** TI / LTE (WhatsApp + card PNG + logos) | `src/core/flashReport.js` + aba Flash |
 | **Gerar Laudo** → PDF, DOC, XLSX, PNG/JPG, JSON | `src/export/` |
 | Persistência offline + undo/redo | `src/store/` (AsyncStorage, 40 snapshots) |
 | **Build web de arquivo único** para teste em campo | `tools/bundleWeb.js` + `web/` → `dist/` |

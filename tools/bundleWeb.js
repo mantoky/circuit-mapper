@@ -22,6 +22,7 @@ const MODULES = [
   'src/core/loadTable.js',
   'src/core/seed.js',
   'src/core/importValidate.js',
+  'src/core/flashReport.js',
   'src/export/fileName.js',
   'src/export/workbookSpec.js',
   'src/export/xlsxWriter.js',

@@ -38,16 +38,22 @@ a um app instalado.
 2. Aba **Construção** → expanda a árvore, veja as barras laterais de status e os chips de fase.
 3. Toque no circuito **C-03 – Correia Transportadora TC-202**. O painel "Verificação NBR 5410
    ao vivo" mostra `Ib = 32,68 A`, `In = 50 A`, `Iz = 36 A` e o apontamento **NC-01**.
+4. Aba **Flash** → *Caso demo* (falha no servidor de impressão Vale/Xerox). Confira o texto
+   WhatsApp, os logos (contratada/contratante) e use *Copiar texto* ou *Baixar card PNG*.
+5. Aba **Conformidade** → filtre por NC e abra o item com o botão *Abrir item*.
+6. Aba **Laudo** → preencha o cabeçalho (ou use o demo) e gere PDF / Word / Excel / PNG.
 4. Tente corrigir só o disjuntor para **32 A** → continua não conforme (`In < Ib`).
    Suba a seção para **10 mm²** e o disjuntor para **40 A** → aparece **NC-05**, porque o PE
    de 6 mm² ficou abaixo do mínimo. Corrija o PE para **10** → fica CONFORME.
    Esse encadeamento é o motor NBR trabalhando, não roteiro pré-gravado.
 5. Toque em ↶ (desfazer) algumas vezes e veja os valores voltarem.
 6. Use o **"+"** de qualquer linha para criar item filho — só aparecem os tipos permitidos pelo schema.
-7. Aba **Conformidade** → filtre por não conformidades, toque em *Abrir item* em qualquer card.
-8. Aba **Laudo** → suba os dois logos pela galeria do telefone, então *Ir para geração*.
-9. Gere **PDF** (abre o diálogo de impressão → *Salvar como PDF*), **Excel**, **Word**, **Imagem** e **Backup**.
-10. Feche o navegador e reabra: o projeto continua lá (`localStorage`).
+7. Aba **Flash** → *Caso demo* (falha no servidor de impressão Vale/Xerox). Confira o texto
+   WhatsApp, envie logos da contratada/contratante e use *Copiar texto* ou *Baixar card PNG*.
+8. Aba **Conformidade** → filtre por não conformidades, toque em *Abrir item* em qualquer card.
+9. Aba **Laudo** → suba os dois logos pela galeria do telefone, então *Ir para geração*.
+10. Gere **PDF** (abre o diálogo de impressão → *Salvar como PDF*), **Excel**, **Word**, **Imagem** e **Backup**.
+11. Feche o navegador e reabra: o projeto continua lá (`localStorage`).
 
 ### Limitações honestas desta versão
 

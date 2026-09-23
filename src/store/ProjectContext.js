@@ -9,7 +9,7 @@ import React, { createContext, useContext, useEffect, useMemo, useReducer, useRe
 import * as engine from '../core/treeEngine';
 import { validateTree } from '../core/validation';
 import { loadState, saveAll, clearAll } from './persistence';
-import { reducer, initialState, emptyHeader } from './projectReducer';
+import { reducer, initialState, emptyHeader, emptyFlashReport } from './projectReducer';
 
 const Ctx = createContext(null);
 
@@ -31,6 +31,7 @@ export function ProjectProvider({ children }) {
           tree: s.tree || [],
           header: s.header || emptyHeader,
           expanded: s.expanded || {},
+          flashReport: s.flashReport || emptyFlashReport(),
           error: s.error || null,
         },
       });
@@ -45,7 +46,12 @@ export function ProjectProvider({ children }) {
     const seq = ++saveSeq.current;
     timer.current = setTimeout(async () => {
       try {
-        await saveAll({ tree: state.tree, header: state.header, expanded: state.expanded });
+        await saveAll({
+          tree: state.tree,
+          header: state.header,
+          expanded: state.expanded,
+          flashReport: state.flashReport,
+        });
         // so confirma SAVED se nenhum save mais novo entrou em voo
         if (seq === saveSeq.current && mounted.current) dispatch({ type: 'SAVED' });
       } catch (err) {
@@ -56,7 +62,7 @@ export function ProjectProvider({ children }) {
       }
     }, 600);
     return () => timer.current && clearTimeout(timer.current);
-  }, [state.tree, state.header, state.expanded, state.ready]);
+  }, [state.tree, state.header, state.expanded, state.flashReport, state.ready]);
 
   const validation = useMemo(() => validateTree(state.tree), [state.tree]);
 
@@ -77,13 +83,16 @@ export function ProjectProvider({ children }) {
     expandAll: () => dispatch({ type: 'SET_EXPANDED_ALL', value: true }),
     collapseAll: () => dispatch({ type: 'SET_EXPANDED_ALL', value: false }),
     setHeader: (patch) => dispatch({ type: 'SET_HEADER', patch }),
+    setFlash: (patch) => dispatch({ type: 'SET_FLASH', patch }),
+    resetFlash: (demo = false) => dispatch({ type: 'RESET_FLASH', demo }),
     undo: () => dispatch({ type: 'UNDO' }),
     redo: () => dispatch({ type: 'REDO' }),
     reset: async () => { await clearAll(); dispatch({ type: 'RESET' }); },
     loadDemo: () => dispatch({ type: 'LOAD_DEMO' }),
-    importProject: ({ tree, header }) => {
+    importProject: ({ tree, header, flashReport }) => {
       dispatch({ type: 'REPLACE_TREE', tree });
       if (header) dispatch({ type: 'SET_HEADER', patch: header });
+      if (flashReport) dispatch({ type: 'SET_FLASH', patch: flashReport });
     },
   }), []);
 
@@ -97,4 +106,4 @@ export function useProject() {
   return ctx;
 }
 
-export { emptyHeader };
+export { emptyHeader, emptyFlashReport };

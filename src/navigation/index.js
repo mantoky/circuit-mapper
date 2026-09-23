@@ -14,6 +14,7 @@ import ExplorerScreen from '../screens/ExplorerScreen';
 import AuditScreen from '../screens/AuditScreen';
 import ReportSetupScreen from '../screens/ReportSetupScreen';
 import ExportScreen from '../screens/ExportScreen';
+import FlashReportScreen from '../screens/FlashReportScreen';
 import { colors, type } from '../theme';
 
 const Tab = createBottomTabNavigator();
@@ -77,6 +78,11 @@ export default function Navigation() {
           options={{ tabBarLabel: 'CONSTRUCAO', tabBarIcon: ({ focused }) => <TabIcon label="ARV" focused={focused} /> }} />
         <Tab.Screen name="Conformidade" component={AuditScreen}
           options={{ tabBarIcon: ({ focused }) => <TabIcon label="NBR" focused={focused} /> }} />
+        <Tab.Screen name="Flash" component={FlashReportScreen}
+          options={{
+            tabBarLabel: 'FLASH',
+            tabBarIcon: ({ focused }) => <TabIcon label="FR" focused={focused} />,
+          }} />
         <Tab.Screen name="Laudo" component={LaudoStack}
           options={{ tabBarIcon: ({ focused }) => <TabIcon label="DOC" focused={focused} /> }} />
       </Tab.Navigator>

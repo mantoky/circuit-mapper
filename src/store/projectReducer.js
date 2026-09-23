@@ -5,6 +5,7 @@
  */
 const engine = require('../core/treeEngine');
 const { buildSeedTree, attachSampleAssets, seedReportHeader } = require('../core/seed');
+const { emptyFlashReport, demoFlashReport } = require('../core/flashReport');
 
 const MAX_HISTORY = 40;
 
@@ -26,6 +27,7 @@ const emptyHeader = {
 
 const initialState = {
   ready: false, tree: [], header: emptyHeader, expanded: {},
+  flashReport: emptyFlashReport(),
   past: [], future: [], dirty: false,
   saveError: null, hydrateError: null,
 };
@@ -90,12 +92,36 @@ function reducer(state, action) {
     case 'SET_HEADER':
       return { ...state, header: { ...state.header, ...action.patch }, dirty: true };
 
+    case 'SET_FLASH':
+      return {
+        ...state,
+        flashReport: { ...state.flashReport, ...action.patch },
+        dirty: true,
+      };
+
+    case 'RESET_FLASH':
+      return {
+        ...state,
+        flashReport: action.demo ? demoFlashReport() : emptyFlashReport({
+          client: state.header.client || '',
+          contractor: state.header.contractor || '',
+          clientLogo: state.header.clientLogo || null,
+          contractorLogo: state.header.contractorLogo || null,
+        }),
+        dirty: true,
+      };
+
     case 'LOAD_DEMO': {
       const tree = attachSampleAssets(buildSeedTree());
       const expanded = {};
       const walk = (l) => (l || []).forEach((n) => { expanded[n.id] = true; walk(n.children); });
       walk(tree);
-      return { ...withHistory(state, tree), header: { ...state.header, ...seedReportHeader }, expanded };
+      return {
+        ...withHistory(state, tree),
+        header: { ...state.header, ...seedReportHeader },
+        flashReport: demoFlashReport(),
+        expanded,
+      };
     }
 
     case 'UNDO': {
@@ -129,4 +155,4 @@ function reducer(state, action) {
   }
 }
 
-module.exports = { reducer, initialState, emptyHeader, MAX_HISTORY };
+module.exports = { reducer, initialState, emptyHeader, emptyFlashReport, MAX_HISTORY };
