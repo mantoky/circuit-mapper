@@ -12,6 +12,12 @@ Autor: **Robson do Carmo — Engenharia Elétrica**
 > um arquivo único, offline, rodando o mesmo motor de `src/core/`. Instruções e roteiro de
 > teste em **[COMO-TESTAR.md](COMO-TESTAR.md)**, que também traz os comandos do APK.
 
+> **Flash Report TI/LTE:** abra `dist/FLASH-REPORT.html` (gerado com `npm run build:flash`)
+> — comunicador operacional de falhas em ambiente de TI e LTE, em arquivo único e offline:
+> monta o informativo no padrão `📢 FLASH REPORT | INFORMATIVO - GER TECN ATEND PA`, com
+> logos da contratada e da contratante, gera o texto pronto para WhatsApp/Teams, cartão
+> imprimível (PDF) e histórico local. Núcleo puro em `src/flash/flashReport.js`.
+
 ---
 
 ## 1. O que o app faz

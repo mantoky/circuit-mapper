@@ -5,18 +5,19 @@
 const { execFileSync } = require('child_process');
 const path = require('path');
 
-const suites = ['engine.test.js', 'flow.test.js', 'exports.test.js', 'safety.test.js', 'web.test.js'];
+const suites = ['engine.test.js', 'flow.test.js', 'exports.test.js', 'safety.test.js', 'flash.test.js', 'flash-web.test.js', 'web.test.js'];
 let failed = 0;
 
 console.log('\n\x1b[43m\x1b[30m  CIRCUIT MAPPER — SUITE DE TESTES  \x1b[0m');
 
 for (const s of suites) {
   console.log(`\n\x1b[1m▸ ${s}\x1b[0m`);
-  if (s === 'web.test.js') {
+  const needsBundle = { 'web.test.js': 'CIRCUIT-MAPPER.html', 'flash-web.test.js': 'FLASH-REPORT.html' }[s];
+  if (needsBundle) {
     // depende do bundle web e do jsdom; nao trava a suite se faltarem
     const fs = require('fs');
-    if (!fs.existsSync(path.join(__dirname, '..', 'dist', 'CIRCUIT-MAPPER.html'))) {
-      console.log('  \x1b[33m(pulado: rode "npm run build:web" antes)\x1b[0m');
+    if (!fs.existsSync(path.join(__dirname, '..', 'dist', needsBundle))) {
+      console.log(`  \x1b[33m(pulado: bundle dist/${needsBundle} ausente)\x1b[0m`);
       continue;
     }
     let hasJsdom = false;
